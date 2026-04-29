@@ -1,0 +1,23 @@
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+postgres_data/
+rabbitmq_data/
+
+# Environment
+.env
+.env.local
+
+# Project Specific
+node_modules/
+target/
+dist/
