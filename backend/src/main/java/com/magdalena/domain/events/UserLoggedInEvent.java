@@ -4,7 +4,11 @@ public class UserLoggedInEvent extends DomainEvent {
     private final String email;
 
     public UserLoggedInEvent(String email) {
-        super();
+        this(email, "Auth Service");
+    }
+
+    public UserLoggedInEvent(String email, String origin) {
+        super(origin);
         this.email = email;
     }
 

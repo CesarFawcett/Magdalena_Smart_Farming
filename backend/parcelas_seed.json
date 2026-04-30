@@ -1,0 +1,41 @@
+[
+  {
+    "id": "b1f7c9a2-3c4d-4a91-9f21-1a2b3c4d5e01",
+    "nombre": "Parcela El Mango",
+    "ubicacion": "Zona rural, Santa Marta, Magdalena",
+    "latitud": 11.2408,
+    "longitud": -74.1990,
+    "areaTotal": 2.5,
+    "unidadArea": "hectareas",
+    "tipoSuelo": "Franco arenoso",
+    "estado": "Activa",
+    "fechaRegistro": "2026-01-15T08:30:00",
+    "enMonitoreo": true
+  },
+  {
+    "id": "c2a8d7b3-5e6f-4b21-8c32-2b3c4d5e6f02",
+    "nombre": "Parcela La Esperanza",
+    "ubicacion": "Vereda Bonda, Magdalena",
+    "latitud": 11.1800,
+    "longitud": -74.1200,
+    "areaTotal": 4.0,
+    "unidadArea": "hectareas",
+    "tipoSuelo": "Arcilloso",
+    "estado": "Activa",
+    "fechaRegistro": "2026-02-10T10:15:00",
+    "enMonitoreo": true
+  },
+  {
+    "id": "d3b9e8c4-6f7a-4c32-9d43-3c4d5e6f7a03",
+    "nombre": "Parcela El Descanso",
+    "ubicacion": "Zona rural, Ciénaga, Magdalena",
+    "latitud": 11.0100,
+    "longitud": -74.2500,
+    "areaTotal": 1.8,
+    "unidadArea": "hectareas",
+    "tipoSuelo": "Franco limoso",
+    "estado": "Inactiva",
+    "fechaRegistro": "2025-12-05T07:45:00",
+    "enMonitoreo": false
+  }
+]

@@ -42,6 +42,13 @@ body {
   padding: 32px 0;
   display: flex;
   flex-direction: column;
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
 }
 
 .sidebar-header {
@@ -144,6 +151,7 @@ body {
 .main-content {
   padding: 24px 40px;
   position: relative;
+  min-width: 0;
 }
 
 .top-bar {
@@ -482,4 +490,347 @@ body {
 @media (max-width: 1200px) {
   .summary-grid { grid-template-columns: repeat(2, 1fr); }
   .lots-grid { grid-template-columns: 1fr; }
+}
+
+/* Premium Modal & Profile Styles (Nature Dark) */
+.profile-icon-btn {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--primary-green);
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-icon-btn:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    transform: rotate(30deg);
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    transition: all 0.3s ease;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal-content {
+    background: #0f172a; /* Slate 900 */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 40px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+    width: 95%;
+    max-width: 550px;
+    max-height: 90vh;
+    padding: 30px;
+    position: relative;
+    overflow-y: auto;
+    animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+@keyframes modalAppear {
+    from { transform: scale(0.9) translateY(40px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.modal-header h2 {
+    font-size: 24px;
+    font-weight: 900;
+    color: white;
+    background: linear-gradient(to right, #fff, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.close-btn {
+    background: rgba(255,255,255,0.07);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: #ef4444;
+    transform: rotate(90deg);
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: #1e293b; /* Slate 800 */
+    border: 2px solid #334155; /* Slate 700 */
+    color: white;
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 16px;
+    margin-top: 30px;
+    position: sticky;
+    bottom: -10px;
+    background: #0f172a;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.btn-secondary {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-primary-modal {
+    flex: 2;
+    background: #10b981;
+    color: #052214;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+    transition: all 0.3s;
+}
+
+.btn-primary-modal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+}
+
+/* Password Toggle Styles */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-field input {
+    padding-right: 50px !important;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    transition: all 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #10b981;
+    transform: scale(1.1);
+}
+
+/* Delete Functionality Styles */
+.lot-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-delete {
+    background: transparent;
+    border: 1px solid #EF4444;
+    color: #EF4444;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-delete:hover {
+    background: #EF4444;
+    color: white;
+    transform: scale(1.05);
+}
+
+.btn-delete svg {
+    width: 18px;
+    height: 18px;
+}
+
+.empty-msg, .error-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    background: var(--white);
+    border-radius: 24px;
+    color: var(--text-muted);
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    border: 1px dashed var(--border-color);
+}
+
+.error-msg {
+    color: #EF4444;
+    border-color: #EF4444;
+}
+
+/* Sensor Selection Styles */
+.sensor-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-height: 160px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.8);
+    padding: 12px;
+    border-radius: 20px;
+    border: 2px solid #1e293b;
+}
+
+.sensor-checkbox-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sensor-checkbox-grid::-webkit-scrollbar-thumb {
+    background: #10b981;
+    border-radius: 10px;
+}
+
+.sensor-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1e293b;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.sensor-item:hover {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.sensor-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #10b981;
+    cursor: pointer;
+}
+
+.sensor-item label {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #f1f5f9;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.sensor-item .sensor-type {
+    display: block;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.loading-sensors {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+    padding: 20px;
 }

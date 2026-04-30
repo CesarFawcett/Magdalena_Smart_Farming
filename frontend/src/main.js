@@ -24,12 +24,19 @@ btnBackToLogin.addEventListener('click', () => {
   loginLinks.classList.remove('hidden');
 });
 
-// Check for existing session on load
+// Check for existing session or remembered email on load
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await getSession();
   if (session) {
     console.log('Bienvenido de nuevo,', session.email);
     document.getElementById('email').value = session.email;
+  } else {
+    // If no session, check for remembered email
+    const rememberedEmail = localStorage.getItem('remembered_email');
+    if (rememberedEmail) {
+      document.getElementById('email').value = rememberedEmail;
+      document.getElementById('remember-me').checked = true;
+    }
   }
 });
 
@@ -57,6 +64,13 @@ loginForm.addEventListener('submit', async (e) => {
       const data = await response.json();
       console.log('Login exitoso:', data);
       
+      const rememberMe = document.getElementById('remember-me').checked;
+      if (rememberMe) {
+        localStorage.setItem('remembered_email', email);
+      } else {
+        localStorage.removeItem('remembered_email');
+      }
+
       await saveSession({ 
         email: data.email,
         name: data.name 

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magdalena Smart Farming | Tablero</title>
+    <title>Magdalena | Centro de Sincronización</title>
     <link rel="stylesheet" href="/src/dashboard.css">
+    <link rel="stylesheet" href="/src/sync.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -20,7 +21,7 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="/dashboard.html" class="nav-item active">
+                <a href="/dashboard.html" class="nav-item">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Tablero
                 </a>
@@ -32,7 +33,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.58 16.14a7 7 0 0 1 6.84 0"></path><circle cx="12" cy="20" r="2"></circle></svg>
                     Gestión de Sensores
                 </a>
-                <a href="/sync.html" class="nav-item">
+                <a href="/sync.html" class="nav-item active">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     Centro de Sincronización
                 </a>
@@ -54,9 +55,8 @@
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
-                <div class="search-container">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="search-input" placeholder="Buscar datos de la finca...">
+                <div class="page-title">
+                    <span class="breadcrumb">Magdalena Smart Farming</span>
                 </div>
 
                 <div class="top-bar-actions">
@@ -70,7 +70,6 @@
                     </div>
                     <button class="notification-btn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                        <span class="notif-badge"></span>
                     </button>
                     <div class="user-profile">
                         <span class="user-name" id="user-display-name">Admin</span>
@@ -84,127 +83,150 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
+            <!-- Sync Content -->
             <div class="content-body">
-                <!-- Summary Section -->
-                <section class="summary-grid">
-                    <div class="summary-card">
+                <div class="sync-grid-top">
+                    <!-- Messaging Status -->
+                    <div class="sync-card messaging">
                         <div class="card-header">
-                            <div class="card-icon health">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 8"></path><path d="M7 20c-3 0-6-4-6-8s3-8 6-8 6 4 6 8-3 8-6 8Z"></path></svg>
+                            <div class="icon-box">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                             </div>
-                            <span class="badge success">ÓPTIMO</span>
+                            <span class="badge rabbit">RabbitMQ Online</span>
                         </div>
-                        <h3 class="card-label">SALUD GENERAL DE LA FINCA</h3>
-                        <p class="card-value" id="health-value">Buena</p>
-                        <div class="progress-container">
-                            <div class="progress-bar green" id="health-bar" style="width: 85%"></div>
+                        <h2>Estado de Mensajería</h2>
+                        <div class="stat-line">
+                            <span class="label">Mensajes Pendientes</span>
+                            <span class="value green-text">12</span>
+                        </div>
+                        <div class="stat-line">
+                            <span class="label">Procesados (24h)</span>
+                            <span class="value">4,892</span>
                         </div>
                     </div>
 
-                    <div class="summary-card">
+                    <!-- LocalDB Status -->
+                    <div class="sync-card localdb-card">
                         <div class="card-header">
-                            <div class="card-icon humidity">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+                            <div class="title-sub">
+                                <div class="icon-box gray">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                </div>
+                                <div class="text">
+                                    <h3>LocalDB (IndexedDB)</h3>
+                                    <p>Almacenamiento local del navegador</p>
+                                </div>
+                            </div>
+                            <button class="btn-sync-force">Forzar Sincronización</button>
+                        </div>
+                        <div class="storage-info">
+                            <div class="storage-labels">
+                                <span>Uso de Almacenamiento</span>
+                                <span class="usage">42.5 MB / 500 MB</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 8.5%"></div>
                             </div>
                         </div>
-                        <h3 class="card-label">HUMEDAD PROMEDIO DEL SUELO</h3>
-                        <p class="card-value" id="humidity-value">42%</p>
-                        <p class="card-trend up">↗ +3% desde el último control</p>
+                        <div class="status-alert success">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Eventos locales pendientes: 0
+                        </div>
                     </div>
 
-                    <div class="summary-card">
-                        <div class="card-header">
-                            <div class="card-icon ph">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5"></path><path d="M14 2v7.5"></path><path d="M8.5 22.5c-4.1 0-7.5-3.4-7.5-7.5 0-2.1 1-3.9 2.5-5.2l.5-.4V2h16v7.4l.5.4c1.5 1.3 2.5 3.1 2.5 5.2 0 4.1-3.4 7.5-7.5 7.5h-7Z"></path></svg>
+                    <!-- Small Indicators -->
+                    <div class="indicators-col">
+                        <div class="mini-card">
+                            <div class="mini-icon blue">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            </div>
+                            <div class="mini-text">
+                                <span class="label">INTEGRIDAD DE DATOS</span>
+                                <span class="value">Verificada (SHA-256)</span>
                             </div>
                         </div>
-                        <h3 class="card-label">NIVEL DE PH PROMEDIO</h3>
-                        <p class="card-value" id="ph-value">6.2</p>
-                        <p class="card-goal">Objetivo: 6.0 - 6.5</p>
-                    </div>
-
-                    <div class="summary-card alerts">
-                        <div class="card-header">
-                            <div class="card-icon warning">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <div class="mini-card">
+                            <div class="mini-icon green">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 19.18a6.66 6.66 0 0 1 3.58 0"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M14.28 4.69a15.91 15.91 0 0 1 8.3 4.31"></path><path d="M12 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z"></path></svg>
+                            </div>
+                            <div class="mini-text">
+                                <span class="label">CAPACIDAD OFFLINE</span>
+                                <span class="value">100% Funcional</span>
                             </div>
                         </div>
-                        <h3 class="card-label">ALERTAS ACTIVAS</h3>
-                        <p class="card-value danger" id="alerts-value">0 Advertencias</p>
-                        <a href="#" class="card-link" id="btn-show-alerts">Revisar Alertas</a>
                     </div>
-                </section>
+                </div>
 
-                <!-- Lots Section -->
-                <section class="lots-grid" id="lots-container">
-                    <!-- Dynamic Lots will be injected here -->
-                </section>
+                <!-- Real-time Flow -->
+                <div class="sync-card flow-section">
+                    <h3>Flujo de Sincronización en Tiempo Real</h3>
+                    <div class="flow-indicators">
+                        <span class="indicator subida">Subida</span>
+                        <span class="indicator bajada">Bajada</span>
+                    </div>
+                    <div class="flow-visual">
+                        <div class="node-box">
+                            <div class="node-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><path d="M6 14v-4"></path><path d="M10 14v-4"></path><path d="M14 14v-4"></path><path d="M18 14v-4"></path></svg>
+                            </div>
+                            <span class="node-name">Edge Node</span>
+                            <span class="node-id">ID: NODE-04-NORTH</span>
+                        </div>
+                        <div class="flow-line">
+                            <div class="latency-badge">LATENCY: 24ms</div>
+                            <div class="animated-dots"></div>
+                        </div>
+                        <div class="node-box cloud">
+                            <div class="node-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c3.037 0 5.5-2.463 5.5-5.5 0-2.97-2.354-5.396-5.293-5.493C16.892 5.093 14.184 3 11 3 8.356 3 6.07 4.545 4.965 6.78 2.222 7.234 0 9.61 0 12.5 0 15.537 2.463 18 5.5 18"></path></svg>
+                            </div>
+                            <span class="node-name">Cloud Store</span>
+                            <span class="node-id">AWS us-east-1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Logs -->
+                <div class="sync-card logs-section">
+                    <div class="logs-header">
+                        <h3>Log de Sincronización Reciente</h3>
+                        <div class="log-filters">
+                            <label>Filtrar por:</label>
+                            <select id="log-filter">
+                                <option>Todos los eventos</option>
+                                <option>Éxito</option>
+                                <option>Errores</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>TIMESTAMP</th>
+                                    <th>EVENTO/ID</th>
+                                    <th>ORIGEN</th>
+                                    <th>ESTADO</th>
+                                    <th>DETALLES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                                <!-- Data will be injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="logs-footer">
+                        <span class="log-count">Mostrando 5 de 1,248 registros</span>
+                        <div class="log-pagination">
+                            <button class="btn-mini-page">&lt;</button>
+                            <button class="btn-mini-page">&gt;</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <!-- FAB -->
-            <button class="fab">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
         </main>
     </div>
-    <!-- Modal for New Parcela -->
-    <div id="parcela-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Registrar Nueva Parcela</h2>
-                <button id="close-modal" class="close-btn">&times;</button>
-            </div>
-            <form id="parcela-form">
-                <div class="form-group">
-                    <label for="p-nombre">Nombre de la Parcela</label>
-                    <input type="text" id="p-nombre" name="nombre" placeholder="Ej: Lote C - Norte" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="p-cultivo">Tipo de Cultivo</label>
-                        <select id="p-cultivo" name="tipoSuelo" required>
-                            <option value="CACAO">Cacao</option>
-                            <option value="BANANO">Banano</option>
-                            <option value="CAFE">Café</option>
-                            <option value="OTRO">Otro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="p-area">Área Total</label>
-                        <input type="number" step="0.01" id="p-area" name="areaTotal" placeholder="0.00" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="p-lat">Latitud</label>
-                        <input type="number" step="0.000001" id="p-lat" name="latitud" placeholder="0.000000">
-                    </div>
-                    <div class="form-group">
-                        <label for="p-lng">Longitud</label>
-                        <input type="number" step="0.000001" id="p-lng" name="longitud" placeholder="0.000000">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="p-ubicacion">Ubicación / Descripción</label>
-                    <textarea id="p-ubicacion" name="ubicacion" rows="2" placeholder="Detalles de la zona..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Asignar Sensores Disponibles</label>
-                    <div id="sensor-selection" class="sensor-checkbox-grid">
-                        <!-- Sensors will be injected here -->
-                        <p class="loading-sensors">Cargando sensores...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="cancel-btn" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary-modal">Guardar Parcela</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Modal for User Profile -->
     <div id="profile-modal" class="modal hidden">
         <div class="modal-content">
@@ -243,6 +265,6 @@
         </div>
     </div>
 
-    <script type="module" src="/src/dashboard.js"></script>
+    <script type="module" src="/src/sync.js"></script>
 </body>
 </html>

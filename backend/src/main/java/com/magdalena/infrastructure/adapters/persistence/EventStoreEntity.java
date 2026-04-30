@@ -27,4 +27,7 @@ public class EventStoreEntity {
 
     @Column(nullable = false)
     private LocalDateTime occurredOn;
+
+    @Column(nullable = false)
+    private String origin;
 }

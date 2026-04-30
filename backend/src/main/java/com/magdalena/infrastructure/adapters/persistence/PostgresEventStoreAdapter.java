@@ -23,6 +23,7 @@ public class PostgresEventStoreAdapter implements EventStorePort {
             entity.setEventId(event.getEventId());
             entity.setEventType(event.getEventType());
             entity.setOccurredOn(event.getOccurredOn());
+            entity.setOrigin(event.getOrigin());
             entity.setPayload(objectMapper.writeValueAsString(event));
             repository.save(entity);
         } catch (Exception e) {

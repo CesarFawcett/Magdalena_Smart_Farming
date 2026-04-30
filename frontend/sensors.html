@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magdalena Smart Farming | Tablero</title>
+    <title>Magdalena | Gestión de Sensores</title>
     <link rel="stylesheet" href="/src/dashboard.css">
+    <link rel="stylesheet" href="/src/sensors.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -20,7 +22,7 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="/dashboard.html" class="nav-item active">
+                <a href="/dashboard.html" class="nav-item">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Tablero
                 </a>
@@ -28,7 +30,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
                     Análisis de Cultivos
                 </a>
-                <a href="/sensors.html" class="nav-item">
+                <a href="/sensors.html" class="nav-item active">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.58 16.14a7 7 0 0 1 6.84 0"></path><circle cx="12" cy="20" r="2"></circle></svg>
                     Gestión de Sensores
                 </a>
@@ -43,20 +45,15 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     Cerrar Sesión
                 </button>
-                <a href="#" class="footer-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    Soporte de Campo
-                </a>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Bar -->
             <header class="top-bar">
-                <div class="search-container">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="search-input" placeholder="Buscar datos de la finca...">
+                <div class="page-title">
+                    <span class="breadcrumb">Magdalena Smart Farming / Gestión</span>
+                    <h1>Nodos y Telemetría</h1>
                 </div>
 
                 <div class="top-bar-actions">
@@ -84,127 +81,121 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
             <div class="content-body">
-                <!-- Summary Section -->
-                <section class="summary-grid">
-                    <div class="summary-card">
-                        <div class="card-header">
-                            <div class="card-icon health">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 8"></path><path d="M7 20c-3 0-6-4-6-8s3-8 6-8 6 4 6 8-3 8-6 8Z"></path></svg>
-                            </div>
-                            <span class="badge success">ÓPTIMO</span>
-                        </div>
-                        <h3 class="card-label">SALUD GENERAL DE LA FINCA</h3>
-                        <p class="card-value" id="health-value">Buena</p>
-                        <div class="progress-container">
-                            <div class="progress-bar green" id="health-bar" style="width: 85%"></div>
-                        </div>
-                    </div>
-
-                    <div class="summary-card">
-                        <div class="card-header">
-                            <div class="card-icon humidity">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label>Filtrar por Cultivo</label>
+                            <div class="select-field">
+                                <select id="filter-parcela">
+                                    <option value="all">Todos los Cultivos</option>
+                                </select>
                             </div>
                         </div>
-                        <h3 class="card-label">HUMEDAD PROMEDIO DEL SUELO</h3>
-                        <p class="card-value" id="humidity-value">42%</p>
-                        <p class="card-trend up">↗ +3% desde el último control</p>
-                    </div>
-
-                    <div class="summary-card">
-                        <div class="card-header">
-                            <div class="card-icon ph">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5"></path><path d="M14 2v7.5"></path><path d="M8.5 22.5c-4.1 0-7.5-3.4-7.5-7.5 0-2.1 1-3.9 2.5-5.2l.5-.4V2h16v7.4l.5.4c1.5 1.3 2.5 3.1 2.5 5.2 0 4.1-3.4 7.5-7.5 7.5h-7Z"></path></svg>
+                        <div class="filter-group">
+                            <label>Estado</label>
+                            <div class="select-field">
+                                <select id="filter-status">
+                                    <option value="all">Todos los Estados</option>
+                                    <option value="Activo">En Línea</option>
+                                    <option value="Inactivo">Fuera de Servicio</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                </select>
                             </div>
                         </div>
-                        <h3 class="card-label">NIVEL DE PH PROMEDIO</h3>
-                        <p class="card-value" id="ph-value">6.2</p>
-                        <p class="card-goal">Objetivo: 6.0 - 6.5</p>
                     </div>
-
-                    <div class="summary-card alerts">
-                        <div class="card-header">
-                            <div class="card-icon warning">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            </div>
+                    <div class="header-actions">
+                        <div class="simulation-controls">
+                            <select id="sim-interval">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="3600">Cada 1 hora</option>
+                                <option value="86400">Cada 1 día</option>
+                            </select>
+                            <button class="btn-simulate" id="btn-simulate">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                Simular Datos
+                            </button>
+                            <button class="btn-clear" id="btn-clear-sensors">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                Limpiar Sensores
+                            </button>
                         </div>
-                        <h3 class="card-label">ALERTAS ACTIVAS</h3>
-                        <p class="card-value danger" id="alerts-value">0 Advertencias</p>
-                        <a href="#" class="card-link" id="btn-show-alerts">Revisar Alertas</a>
+                        <button class="btn-primary" id="btn-add-sensor">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Añadir Sensor
+                        </button>
                     </div>
-                </section>
+                </div>
 
-                <!-- Lots Section -->
-                <section class="lots-grid" id="lots-container">
-                    <!-- Dynamic Lots will be injected here -->
-                </section>
+                <!-- Sensors Grid -->
+                <div class="sensors-grid" id="sensors-grid">
+                    <!-- Cards will be injected here -->
+                </div>
             </div>
-
-            <!-- FAB -->
-            <button class="fab">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
         </main>
     </div>
-    <!-- Modal for New Parcela -->
-    <div id="parcela-modal" class="modal hidden">
+
+    <!-- Modal for Adding Sensor -->
+    <div id="sensor-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Registrar Nueva Parcela</h2>
-                <button id="close-modal" class="close-btn">&times;</button>
+                <h2>Configurar Nuevo Sensor</h2>
+                <button id="close-sensor-modal" class="close-btn">&times;</button>
             </div>
-            <form id="parcela-form">
+            <form id="sensor-form">
                 <div class="form-group">
-                    <label for="p-nombre">Nombre de la Parcela</label>
-                    <input type="text" id="p-nombre" name="nombre" placeholder="Ej: Lote C - Norte" required>
+                    <label for="sensor-nombre">Nombre del Dispositivo</label>
+                    <input type="text" id="sensor-nombre" name="nombre" placeholder="Ej. Nodo Humedad 05" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="p-cultivo">Tipo de Cultivo</label>
-                        <select id="p-cultivo" name="tipoSuelo" required>
-                            <option value="CACAO">Cacao</option>
-                            <option value="BANANO">Banano</option>
-                            <option value="CAFE">Café</option>
-                            <option value="OTRO">Otro</option>
+                        <label for="sensor-tipo">Tipo de Sensor</label>
+                        <select id="sensor-tipo" name="tipo" required>
+                            <option value="Humedad">Humedad de Suelo</option>
+                            <option value="pH">Potencial Hidrógeno (pH)</option>
+                            <option value="Temperatura">Temperatura Ambiente</option>
+                            <option value="Multiparamétrico">Multiparamétrico</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="p-area">Área Total</label>
-                        <input type="number" step="0.01" id="p-area" name="areaTotal" placeholder="0.00" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="p-lat">Latitud</label>
-                        <input type="number" step="0.000001" id="p-lat" name="latitud" placeholder="0.000000">
-                    </div>
-                    <div class="form-group">
-                        <label for="p-lng">Longitud</label>
-                        <input type="number" step="0.000001" id="p-lng" name="longitud" placeholder="0.000000">
+                        <label for="sensor-unidad">Unidad de Medida</label>
+                        <input type="text" id="sensor-unidad" name="unidad" placeholder="Ej. %, pH, °C" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="p-ubicacion">Ubicación / Descripción</label>
-                    <textarea id="p-ubicacion" name="ubicacion" rows="2" placeholder="Detalles de la zona..."></textarea>
+                    <label for="sensor-parcelas">Asignar a Parcelas (Mantén Ctrl para seleccionar varias)</label>
+                    <select id="sensor-parcelas" name="parcelaIds" multiple required class="multi-select">
+                        <!-- Populated dynamically -->
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Asignar Sensores Disponibles</label>
-                    <div id="sensor-selection" class="sensor-checkbox-grid">
-                        <!-- Sensors will be injected here -->
-                        <p class="loading-sensors">Cargando sensores...</p>
+                    <label for="sensor-modo">Modo de Operación Inicial</label>
+                    <div class="mode-options">
+                        <label class="radio-label">
+                            <input type="radio" name="modoOperacion" value="ENCENDIDO" checked> 
+                            <span>Automático</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="modoOperacion" value="MANUAL"> 
+                            <span>Manual</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="modoOperacion" value="APAGADO"> 
+                            <span>Apagado</span>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="cancel-btn" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary-modal">Guardar Parcela</button>
+                    <button type="button" class="btn-secondary" id="cancel-sensor-btn">Cancelar</button>
+                    <button type="submit" class="btn-primary-modal">Guardar Dispositivo</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Modal for User Profile -->
     <div id="profile-modal" class="modal hidden">
         <div class="modal-content">
@@ -243,6 +234,6 @@
         </div>
     </div>
 
-    <script type="module" src="/src/dashboard.js"></script>
+    <script type="module" src="/src/sensors.js"></script>
 </body>
 </html>
