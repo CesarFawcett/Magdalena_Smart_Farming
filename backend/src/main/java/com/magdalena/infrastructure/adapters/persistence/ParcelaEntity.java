@@ -28,4 +28,5 @@ public class ParcelaEntity {
     private Double currentHealth;
     private Double currentHumidity;
     private Double currentPh;
+    private Double currentTemperature;
 }

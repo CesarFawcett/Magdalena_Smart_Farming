@@ -73,8 +73,11 @@ loginForm.addEventListener('submit', async (e) => {
 
       await saveSession({ 
         email: data.email,
-        name: data.name 
+        name: data.name,
+        token: data.token
       });
+      // Also store in localStorage for quick sync access in authFetch
+      localStorage.setItem('magdalena_session', JSON.stringify({ token: data.token }));
 
       loginBtn.style.background = '#4ADE80';
       loginBtn.textContent = '¡Acceso Concedido!';

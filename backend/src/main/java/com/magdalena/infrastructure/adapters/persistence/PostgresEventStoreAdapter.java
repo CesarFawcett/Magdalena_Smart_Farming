@@ -30,4 +30,9 @@ public class PostgresEventStoreAdapter implements EventStorePort {
             throw new RuntimeException("Error saving event to store", e);
         }
     }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }

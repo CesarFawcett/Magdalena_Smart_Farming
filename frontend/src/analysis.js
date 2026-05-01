@@ -1,7 +1,9 @@
 import { getSession, clearSession } from './utils/db';
+import { authFetch } from './utils/api';
 
 const btnLogout = document.getElementById('btn-logout');
 const btnRefreshEvents = document.getElementById('btn-refresh-events');
+const btnClearEvents = document.getElementById('btn-clear-events');
 const eventTableBody = document.getElementById('event-table-body');
 const selectParcela = document.getElementById('select-parcela');
 const timeRangeSelect = document.getElementById('time-range');
@@ -28,6 +30,7 @@ let allSensors = [];
 let allEvents = [];
 let humidityChart = null;
 let phChart = null;
+let tempChart = null;
 let currentParcel = null;
 window.filteredEvents = [];
 
@@ -55,9 +58,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function loadParcels() {
     try {
         const [parcelasRes, sensorsRes] = await Promise.all([
-            fetch('http://localhost:8080/api/parcelas'),
-            fetch('http://localhost:8080/api/sensors').catch(() => ({ json: () => [] }))
+            authFetch('http://localhost:8080/api/parcelas'),
+            authFetch('http://localhost:8080/api/sensors')
         ]);
+        
+        if (!parcelasRes || !sensorsRes) return;
+        
         allParcels = await parcelasRes.json();
         allSensors = await sensorsRes.json();
         
@@ -70,7 +76,7 @@ async function loadParcels() {
             let selectedParcel = { id: 'all', nombre: 'Todas las parcelas', tipoSuelo: 'Múltiples' };
             selectParcela.value = 'all';
             if (parcelId) {
-                const found = allParcels.find(p => p.id === parcelId);
+                const found = allParcels.find(p => String(p.id) === String(parcelId));
                 if (found) {
                     selectedParcel = found;
                     selectParcela.value = allParcels.indexOf(found);
@@ -107,15 +113,40 @@ function populateParcelSelector() {
         updateAnalysis();
         filterEventsAndRender();
     });
+
+    timeRangeSelect.addEventListener('change', () => {
+        updateAnalysis();
+    });
 }
 
-function generateTimeLabels(days) {
+function generateTimeLabels(range) {
     const labels = [];
     const now = new Date();
+    
+    if (range === '1h') {
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now.getTime() - (i * 10 * 60 * 1000));
+            labels.push(d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0'));
+        }
+        return labels;
+    }
+
+    if (range === 'today') {
+        for (let i = 144; i >= 0; i--) {
+            const d = new Date(now.getTime() - (i * 10 * 60 * 1000));
+            if (i % 6 === 0) { // Only show label every hour
+                labels.push(d.getHours().toString().padStart(2, '0') + ':00');
+            } else {
+                labels.push(''); // Empty for spacing
+            }
+        }
+        return labels;
+    }
+
+    const days = parseInt(range);
     for (let i = days - 1; i >= 0; i--) {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
-        // Show day name for small ranges, date for longer ones
         if (days <= 7) {
             labels.push(d.toLocaleDateString('es-CO', { weekday: 'short' }).toUpperCase());
         } else {
@@ -125,74 +156,162 @@ function generateTimeLabels(days) {
     return labels;
 }
 
+const btnPhDetails = document.getElementById('btn-ph-details');
+
 function updateAnalysis() {
     if (!currentParcel) return;
     
     document.getElementById('analysis-title').textContent = `Análisis de ${currentParcel.nombre} - ${currentParcel.tipoSuelo || 'Franco arenoso'}`;
     
-    const days = parseInt(timeRangeSelect.value);
-    const labels = generateTimeLabels(days);
+    const rangeValue = timeRangeSelect.value;
+    const labels = generateTimeLabels(rangeValue);
     
-    // Generate data based on days
-    const baseHumidity = 60 + Math.random() * 10;
-    const humidityData = labels.map(() => baseHumidity + (Math.random() * 6 - 3));
+    let parcelEvents = getEventsForCurrentParcel();
+    const humidityEvents = parcelEvents.filter(e => e.eventType.includes('HUMEDAD'));
+    const tempEvents = parcelEvents.filter(e => e.eventType.includes('TEMP'));
+    
+    const humidityData = labels.map((label, idx) => calculateIntervalAverage(humidityEvents, rangeValue, idx, labels.length, currentParcel.currentHumidity || 65, 5));
+    const tempData = labels.map((label, idx) => calculateIntervalAverage(tempEvents, rangeValue, idx, labels.length, currentParcel.currentTemperature || 24, 2));
 
     initHumidityChart(labels, humidityData);
-    initPhGauge(currentParcel.currentPh || (5.5 + Math.random() * 1.5).toFixed(1));
+    initTempChart(labels, tempData);
+    
+    // Get latest pH reading
+    const phEvents = parcelEvents.filter(e => e.eventType.includes('PH'));
+    let latestPh = currentParcel.currentPh || 6.5;
+    
+    if (phEvents.length > 0) {
+        phEvents.sort((a, b) => new Date(b.occurredOn) - new Date(a.occurredOn));
+        const p = typeof phEvents[0].payload === 'string' ? JSON.parse(phEvents[0].payload) : phEvents[0].payload;
+        latestPh = parseFloat(p.value) || latestPh;
+    }
+    
+    initPhGauge(latestPh);
+}
+
+function calculateIntervalAverage(events, rangeValue, idx, totalLabels, baseValue, variance) {
+    const now = new Date();
+    let startTime, endTime;
+
+    if (rangeValue === '1h' || rangeValue === 'today') {
+        const minutesBack = (totalLabels - idx) * 10;
+        startTime = new Date(now.getTime() - (minutesBack * 60 * 1000));
+        endTime = new Date(startTime.getTime() + (10 * 60 * 1000));
+    } else {
+        const daysBack = totalLabels - 1 - idx;
+        startTime = new Date(now);
+        startTime.setDate(startTime.getDate() - daysBack);
+        startTime.setHours(0, 0, 0, 0);
+        endTime = new Date(startTime);
+        endTime.setHours(23, 59, 59, 999);
+    }
+
+    const intervalEvents = events.filter(e => {
+        const d = new Date(e.occurredOn);
+        return d >= startTime && d <= endTime;
+    });
+    
+    if (intervalEvents.length > 0) {
+        const sum = intervalEvents.reduce((acc, e) => {
+            const p = typeof e.payload === 'string' ? JSON.parse(e.payload) : e.payload;
+            return acc + (parseFloat(p.value) || 0);
+        }, 0);
+        return (sum / intervalEvents.length).toFixed(1);
+    }
+    
+    const seed = (idx / totalLabels) * Math.PI;
+    return (baseValue + Math.sin(seed) * variance + (Math.random() * (variance/2) - (variance/4))).toFixed(1);
+}
+
+function initTempChart(labels, data) {
+    const ctx = document.getElementById('temp-large-chart').getContext('2d');
+    if (tempChart) tempChart.destroy();
+    tempChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Temp °C',
+                data: data,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: labels.length > 30 ? 0 : 4,
+                pointBackgroundColor: '#ef4444'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { min: 10, max: 45, grid: { borderDash: [5, 5] } },
+                x: { 
+                    grid: { display: false },
+                    ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 12 }
+                }
+            }
+        }
+    });
+}
+
+// pH Details listener
+if (btnPhDetails) {
+    btnPhDetails.addEventListener('click', () => {
+        const parcelEvents = getEventsForCurrentParcel();
+        const phEvents = parcelEvents.filter(e => e.eventType.includes('PH'));
+        
+        if (phEvents.length === 0) {
+            alert(`No hay historial de pH registrado para ${currentParcel.nombre}.`);
+            return;
+        }
+
+        window.filteredEvents = phEvents;
+        currentPage = 1;
+        updatePaginatedEvents();
+        modalHistory.classList.add('active');
+    });
+}
+
+function getEventsForCurrentParcel() {
+    if (!currentParcel || currentParcel.id === 'all') return allEvents;
+
+    // Get sensor IDs for this parcel
+    const parcelSensors = allSensors.filter(s => 
+        s.parcelas && s.parcelas.some(p => String(p.id) === String(currentParcel.id))
+    );
+    const sensorIds = parcelSensors.map(s => String(s.id));
+    const sensorNames = parcelSensors.map(s => s.nombre.toLowerCase());
+
+    return allEvents.filter(e => {
+        try {
+            const p = typeof e.payload === 'string' ? JSON.parse(e.payload) : e.payload;
+            const sid = p.sensorId ? String(p.sensorId) : null;
+            const sname = p.sensorName ? p.sensorName.toLowerCase() : (e.origin ? e.origin.toLowerCase() : '');
+            
+            if (sid && sensorIds.includes(sid)) return true;
+            if (sname && sensorNames.some(name => sname.includes(name))) return true;
+        } catch(ex) {}
+        return false;
+    });
 }
 
 async function loadEventHistory() {
     eventTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">Cargando historial...</td></tr>';
     
     try {
-        const response = await fetch('http://localhost:8080/api/events');
+        const response = await authFetch('http://localhost:8080/api/events');
+        if (!response) return;
         allEvents = await response.json();
     } catch (error) {
         console.error('Error loading events:', error);
-        allEvents = [
-            { eventId: 'EVT-99201', occurredOn: '2026-10-27T14:32:01', eventType: 'LECTURA_HUMEDAD', payload: '{"value": "65.4%"}', origin: 'Nodo_Banano_04' },
-            { eventId: 'EVT-99185', occurredOn: '2026-10-27T13:15:44', eventType: 'UMBRAL_PH_EXCEDIDO', payload: '{"value": "4.8 pH"}', origin: 'Nodo_Cacao_02' },
-            { eventId: 'EVT-99172', occurredOn: '2026-10-27T12:45:10', eventType: 'LECTURA_HUMEDAD', payload: '{"value": "62.1%"}', origin: 'Nodo_Cacao_01' },
-            { eventId: 'EVT-99160', occurredOn: '2026-10-27T10:20:05', eventType: 'SINC_LOCAL_CLOUD', payload: '{"value": "OK"}', origin: 'Gateway_Central' }
-        ];
     }
     filterEventsAndRender();
 }
 
 function filterEventsAndRender() {
-    let filteredEvents = allEvents;
-    
-    if (currentParcel && currentParcel.id !== 'all') {
-        filteredEvents = allEvents.filter(e => {
-            let sName = e.origin;
-            try {
-                const p = typeof e.payload === 'string' ? JSON.parse(e.payload) : e.payload;
-                if (p.sensorName) sName = p.sensorName;
-            } catch(ex) {}
-            
-            if (!sName) return true;
-            if (sName === 'Gateway_Central' || sName === 'Sistema Central' || sName === 'Operador Manual') return true;
-            
-            const sensor = allSensors.find(s => s.nombre === sName || s.id === sName);
-            if (sensor && sensor.parcelas) {
-                return sensor.parcelas.some(p => p.id === currentParcel.id);
-            }
-            
-            // Fallback text matching
-            if (currentParcel.nombre) {
-                const pName = currentParcel.nombre.toLowerCase();
-                const sNameLower = sName.toLowerCase();
-                if (pName.includes('banano') && sNameLower.includes('banano')) return true;
-                if (pName.includes('cacao') && sNameLower.includes('cacao')) return true;
-                if (pName.includes('invernadero') && sNameLower.includes('invernadero')) return true;
-                
-                // Allow if we really can't determine
-                if (e.eventType.includes('MANUAL')) return true;
-            }
-            
-            return false;
-        });
-    }
+    let filteredEvents = getEventsForCurrentParcel();
     
     filteredEvents.sort((a, b) => new Date(b.occurredOn) - new Date(a.occurredOn));
     window.filteredEvents = filteredEvents;
@@ -390,6 +509,21 @@ async function downloadPDF() {
 
 // Event Listeners
 btnRefreshEvents.addEventListener('click', loadEventHistory);
+
+if (btnClearEvents) {
+    btnClearEvents.addEventListener('click', async () => {
+        if (!confirm('¿Estás seguro de que deseas borrar TODO el historial de eventos inmutable? Esta acción no se puede deshacer.')) return;
+        
+        try {
+            const response = await authFetch('http://localhost:8080/api/events/clear', { method: 'POST' });
+            if (response && response.ok) {
+                loadEventHistory();
+            }
+        } catch (error) {
+            console.error('Error clearing events:', error);
+        }
+    });
+}
 timeRangeSelect.addEventListener('change', updateAnalysis);
 btnDownloadPdf.addEventListener('click', downloadPDF);
 

@@ -338,13 +338,111 @@ body::before {
   text-decoration: underline;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Notification Badge Active */
+.notif-badge.active {
+  display: block;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #EF4444;
+  border-radius: 50%;
+  border: 2px solid #FFF;
+  animation: pulse-red 2s infinite;
 }
 
-@media (max-width: 480px) {
-  .login-card {
-    padding: 32px 24px;
-  }
+@keyframes pulse-red {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Rain Alert Modal */
+.weather-alert-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.weather-alert-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 24px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.alert-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: #DBEAFE;
+  color: #2563EB;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 24px;
+  animation: bounce 2s infinite;
+}
+
+.weather-alert-card h2 {
+  color: #1E3A8A;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.weather-alert-card p {
+  color: #4B5563;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.alert-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-weather-ok {
+  background: #2563EB;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-weather-ok:hover {
+  background: #1D4ED8;
+  transform: translateY(-2px);
+}
+
+.dont-show-again {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6B7280;
+  cursor: pointer;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }

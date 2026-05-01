@@ -110,7 +110,7 @@
                         </div>
                         <h3 class="card-label">HUMEDAD PROMEDIO DEL SUELO</h3>
                         <p class="card-value" id="humidity-value">42%</p>
-                        <p class="card-trend up">↗ +3% desde el último control</p>
+                        <p class="card-trend up" id="humidity-trend">↗ +3% desde el último control</p>
                     </div>
 
                     <div class="summary-card">
@@ -205,6 +205,32 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- Modal for Alert Details -->
+    <div id="alert-modal" class="modal hidden">
+        <div class="modal-content" style="border-top: 5px solid #EF4444;">
+            <div class="modal-header">
+                <h2 id="alert-title" style="background: linear-gradient(to right, #EF4444, #F87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Diagnóstico de Alerta</h2>
+                <button id="close-alert-modal" class="close-btn">&times;</button>
+            </div>
+            <div class="alert-body" style="color: #94a3b8; padding: 20px 0;">
+                <div id="alert-parcel-name" style="color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 15px;"></div>
+                <div class="alert-card" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+                    <p id="alert-reason" style="color: #FCA5A5; font-size: 15px; line-height: 1.6;"></p>
+                </div>
+                <div class="recommendation" style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 16px;">
+                    <h3 style="color: white; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;">Acción Recomendada:</h3>
+                    <p id="alert-action" style="font-size: 14px;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="close-alert-btn">Cerrar</button>
+                <button type="button" class="btn-primary-modal" id="go-to-analysis-btn">Ver Historial Completo</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal for User Profile -->
     <div id="profile-modal" class="modal hidden">
         <div class="modal-content">
@@ -242,6 +268,11 @@
             </form>
         </div>
     </div>
+
+    <!-- Global Notifications & EDA -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/src/notifications.js"></script>
 
     <script type="module" src="/src/dashboard.js"></script>
 </body>

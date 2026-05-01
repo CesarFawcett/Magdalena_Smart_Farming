@@ -29,6 +29,7 @@ public class Parcela {
     private Double currentHealth;
     private Double currentHumidity;
     private Double currentPh;
+    private Double currentTemperature;
 
     private java.util.List<java.util.UUID> sensorIds;
 }

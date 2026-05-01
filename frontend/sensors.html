@@ -142,21 +142,23 @@
     <div id="sensor-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Configurar Nuevo Sensor</h2>
+                <h2 id="modal-title">Configurar Nuevo Sensor</h2>
                 <button id="close-sensor-modal" class="close-btn">&times;</button>
             </div>
             <form id="sensor-form">
-                <div class="form-group">
+                <div class="form-group" id="group-nombre">
                     <label for="sensor-nombre">Nombre del Dispositivo</label>
                     <input type="text" id="sensor-nombre" name="nombre" placeholder="Ej. Nodo Humedad 05" required>
                 </div>
-                <div class="form-row">
+                <div class="form-row" id="group-tipo-unidad">
                     <div class="form-group">
                         <label for="sensor-tipo">Tipo de Sensor</label>
                         <select id="sensor-tipo" name="tipo" required>
                             <option value="Humedad">Humedad de Suelo</option>
                             <option value="pH">Potencial Hidrógeno (pH)</option>
                             <option value="Temperatura">Temperatura Ambiente</option>
+                            <option value="Clima">Probabilidad de Lluvia</option>
+                            <option value="Viento">Velocidad del Viento</option>
                             <option value="Multiparamétrico">Multiparamétrico</option>
                         </select>
                     </div>
@@ -165,13 +167,13 @@
                         <input type="text" id="sensor-unidad" name="unidad" placeholder="Ej. %, pH, °C" required>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="group-parcelas">
                     <label for="sensor-parcelas">Asignar a Parcelas (Mantén Ctrl para seleccionar varias)</label>
                     <select id="sensor-parcelas" name="parcelaIds" multiple required class="multi-select">
                         <!-- Populated dynamically -->
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="group-modo">
                     <label for="sensor-modo">Modo de Operación Inicial</label>
                     <div class="mode-options">
                         <label class="radio-label">
@@ -233,6 +235,11 @@
             </form>
         </div>
     </div>
+
+    <!-- Global Notifications & EDA -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/src/notifications.js"></script>
 
     <script type="module" src="/src/sensors.js"></script>
 </body>

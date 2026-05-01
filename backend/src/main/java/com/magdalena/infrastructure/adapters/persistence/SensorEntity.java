@@ -22,7 +22,7 @@ public class SensorEntity {
     @Column(nullable = false)
     private String unidad;
     
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sensor_parcelas",
         joinColumns = @JoinColumn(name = "sensor_id"),

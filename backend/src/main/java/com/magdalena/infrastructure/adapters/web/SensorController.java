@@ -61,11 +61,39 @@ public class SensorController {
         return sensorRepository.findAll();
     }
 
+    @PostMapping
+    public ResponseEntity<SensorEntity> save(@RequestBody SensorEntity sensor) {
+        if (sensor.getId() == null) {
+            sensor.setId(UUID.randomUUID());
+        }
+        
+        // Ensure parcels are managed if provided
+        if (sensor.getParcelas() != null) {
+            java.util.Set<com.magdalena.infrastructure.adapters.persistence.ParcelaEntity> managedParcels = new java.util.HashSet<>();
+            sensor.getParcelas().forEach(p -> {
+                parcelaRepository.findById(p.getId()).ifPresent(managedParcels::add);
+            });
+            sensor.setParcelas(managedParcels);
+        }
+        
+        return ResponseEntity.ok(sensorRepository.save(sensor));
+    }
+
     @PostMapping("/simulate")
     public ResponseEntity<String> simulate(@RequestParam int intervalSeconds) {
         simulationService.startSimulation(intervalSeconds);
-        System.out.println("🚀 Simulación iniciada con intervalo de: " + intervalSeconds + " segundos");
         return ResponseEntity.ok("Simulación iniciada con éxito");
+    }
+
+    @PostMapping("/simulate/stop")
+    public ResponseEntity<Void> stopSimulation() {
+        simulationService.stopSimulation();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/simulate/status")
+    public ResponseEntity<Map<String, Boolean>> getSimulationStatus() {
+        return ResponseEntity.ok(Map.of("running", simulationService.isSimulationRunning()));
     }
 
     @PostMapping("/clear")
@@ -94,6 +122,16 @@ public class SensorController {
         return sensorRepository.findById(id).map(sensor -> {
             sensor.setModoOperacion(updated.getModoOperacion());
             sensor.setEstado(updated.getEstado());
+            
+            // Allow updating parcels
+            if (updated.getParcelas() != null) {
+                java.util.Set<com.magdalena.infrastructure.adapters.persistence.ParcelaEntity> managedParcels = new java.util.HashSet<>();
+                updated.getParcelas().forEach(p -> {
+                    parcelaRepository.findById(p.getId()).ifPresent(managedParcels::add);
+                });
+                sensor.setParcelas(managedParcels);
+            }
+            
             return ResponseEntity.ok(sensorRepository.save(sensor));
         }).orElse(ResponseEntity.notFound().build());
     }

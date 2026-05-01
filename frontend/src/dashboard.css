@@ -430,6 +430,12 @@ body {
 
 .stat-value.alert-text { color: var(--danger); }
 
+.lot-chart-container {
+  height: 200px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
 .lot-progress {
   height: 6px;
   background: #F1F5F9;
@@ -748,6 +754,36 @@ body {
     width: 18px;
     height: 18px;
 }
+
+/* Interactive Charts Styles */
+.stat-item.clickable {
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 6px 12px;
+    border-radius: 12px;
+}
+
+.stat-item.clickable:hover {
+    background: rgba(16, 185, 129, 0.08);
+    transform: translateY(-2px);
+}
+
+.stat-item.clickable:active {
+    transform: scale(0.95);
+}
+
+.chart-header-mini {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    border-left: 3px solid var(--success);
+    padding-left: 8px;
+}
+
+.stat-icon.temp { color: #f87171; }
 
 .empty-msg, .error-msg {
     grid-column: 1 / -1;

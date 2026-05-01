@@ -101,6 +101,8 @@
                         <div class="date-selector">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             <select id="time-range">
+                                <option value="1h">Última hora</option>
+                                <option value="today">Hoy (Detallado)</option>
                                 <option value="7">Últimos 7 días</option>
                                 <option value="30">Últimos 30 días</option>
                                 <option value="60">Últimos 2 meses</option>
@@ -124,13 +126,32 @@
                                 </div>
                                 <div class="title-sub">
                                     <h3>Análisis de Humedad</h3>
-                                    <p>Humedad relativa del suelo por sensor promediado</p>
+                                    <p>Humedad relativa del suelo</p>
                                 </div>
                             </div>
                             <span class="badge success">ESTABLE</span>
                         </div>
                         <div class="chart-container-large">
                             <canvas id="humidity-large-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Analysis -->
+                    <div class="analysis-card chart-card">
+                        <div class="card-header">
+                            <div class="header-left">
+                                <div class="icon temp" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+                                </div>
+                                <div class="title-sub">
+                                    <h3>Análisis Térmico</h3>
+                                    <p>Temperatura del cultivo</p>
+                                </div>
+                            </div>
+                            <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">ÓPTIMO</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="temp-large-chart"></canvas>
                         </div>
                     </div>
 
@@ -146,7 +167,9 @@
                                     <p>Medición química en tiempo real</p>
                                 </div>
                             </div>
-                            <span class="btn-text">DETALLES</span>
+                            <div class="analysis-btn" id="btn-ph-details" style="cursor: pointer;">
+                                <span class="btn-text">DETALLES</span>
+                            </div>
                         </div>
                         <div class="gauge-section">
                             <div class="gauge-container">
@@ -184,6 +207,7 @@
                             <p>Registro auditable de telemetría y alertas de sensores.</p>
                         </div>
                         <div class="header-actions">
+                            <button class="btn-outline-sm" id="btn-clear-events" style="border-color: #ef4444; color: #ef4444;">Borrar Historial</button>
                             <button class="btn-outline-sm">Filtros</button>
                             <button class="btn-outline-sm" id="btn-refresh-events">Refrescar</button>
                         </div>
@@ -289,6 +313,11 @@
             </form>
         </div>
     </div>
+
+    <!-- Global Notifications & EDA -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/src/notifications.js"></script>
 
     <script type="module" src="/src/analysis.js"></script>
 </body>

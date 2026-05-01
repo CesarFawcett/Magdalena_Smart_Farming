@@ -3,44 +3,8 @@ import { getSession, clearSession } from './utils/db';
 const btnLogout = document.getElementById('btn-logout');
 const logsTableBody = document.getElementById('logs-table-body');
 
-// Mock Logs
-const logs = [
-    {
-        timestamp: '2026-04-29 14:22:01',
-        id: '#TRX-9921',
-        origin: 'Node-Edge-04',
-        status: 'SUCCESS',
-        details: 'Data packet synchronized via MQTT.'
-    },
-    {
-        timestamp: '2026-04-29 14:21:58',
-        id: '#TRX-9920',
-        origin: 'Node-Edge-02',
-        status: 'SUCCESS',
-        details: 'Heartbeat signal received and logged.'
-    },
-    {
-        timestamp: '2026-04-29 14:20:12',
-        id: '#TRX-9918',
-        origin: 'Node-Edge-04',
-        status: 'RETRYING',
-        details: 'Handshake timeout. Automatic retry #2.'
-    },
-    {
-        timestamp: '2026-04-29 14:18:45',
-        id: '#TRX-9915',
-        origin: 'Node-Edge-01',
-        status: 'ERROR',
-        details: 'Payload integrity mismatch (SHA-256).'
-    },
-    {
-        timestamp: '2026-04-29 14:15:30',
-        id: '#TRX-9912',
-        origin: 'Node-Edge-03',
-        status: 'SUCCESS',
-        details: 'Full batch synchronization complete.'
-    }
-];
+let allEvents = [];
+let stompClient = null;
 
 // Check Session on Load
 window.addEventListener('DOMContentLoaded', async () => {
@@ -54,19 +18,108 @@ window.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('user-display-name').textContent = session.name;
     }
     
-    renderLogs(logs);
+    await loadSyncLogs();
+    connectWebSocket();
 });
 
+function connectWebSocket() {
+    const socket = new SockJS('http://localhost:8080/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null; // Quiet logs
+
+    stompClient.connect({}, () => {
+        console.log('Sync Center: Conectado a EDA Stream');
+        stompClient.subscribe('/topic/sensors', (message) => {
+            const event = JSON.parse(message.body);
+            addLiveEvent(event);
+        });
+    }, (error) => {
+        console.error('WebSocket Error:', error);
+        setTimeout(connectWebSocket, 5000); // Retry
+    });
+}
+
+function addLiveEvent(event) {
+    // Add to top of list
+    const date = new Date(event.occurredOn).toLocaleString('es-CO');
+    const id = `#TRX-${String(event.eventId).substring(0, 4).toUpperCase()}`;
+    
+    let details = 'N/A';
+    try {
+        const p = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload;
+        details = p.value || p.email || 'Registro sincronizado';
+    } catch(ex) {}
+
+    const isSuccess = !event.eventType.includes('ERROR') && !event.eventType.includes('ALERT');
+    const status = isSuccess ? 'SUCCESS' : 'WARNING';
+
+    const row = document.createElement('tr');
+    row.className = 'live-row';
+    row.innerHTML = `
+        <td style="color: #64748b;">${date}</td>
+        <td class="event-id">${id}</td>
+        <td>${event.origin || 'Edge-Gateway'}</td>
+        <td><span class="status-badge ${status.toLowerCase()}">${status}</span></td>
+        <td style="color: #475569;">${event.eventType}: ${details}</td>
+    `;
+    
+    logsTableBody.prepend(row);
+
+    // Keep table size manageable
+    if (logsTableBody.children.length > 50) {
+        logsTableBody.lastElementChild.remove();
+    }
+}
+
+async function loadSyncLogs() {
+    try {
+        const response = await fetch('http://localhost:8080/api/events', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Error fetching events');
+        
+        allEvents = await response.json();
+        allEvents.sort((a, b) => new Date(b.occurredOn) - new Date(a.occurredOn));
+        
+        renderLogs(allEvents.slice(0, 20)); // Last 20
+    } catch (error) {
+        console.error('Error loading sync logs:', error);
+        logsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444;">Error al conectar con el Centro de Sincronización.</td></tr>';
+    }
+}
+
 function renderLogs(data) {
-    logsTableBody.innerHTML = data.map(l => `
-        <tr>
-            <td style="color: #64748b;">${l.timestamp}</td>
-            <td class="event-id">${l.id}</td>
-            <td>${l.origin}</td>
-            <td><span class="status-badge ${l.status.toLowerCase()}">${l.status}</span></td>
-            <td style="color: #475569;">${l.details}</td>
-        </tr>
-    `).join('');
+    if (data.length === 0) {
+        logsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">No hay transacciones registradas.</td></tr>';
+        return;
+    }
+
+    logsTableBody.innerHTML = data.map(e => {
+        const date = new Date(e.occurredOn).toLocaleString('es-CO');
+        const id = `#TRX-${String(e.eventId).substring(0, 4).toUpperCase()}`;
+        
+        let details = 'N/A';
+        try {
+            const p = typeof e.payload === 'string' ? JSON.parse(e.payload) : e.payload;
+            details = p.value || p.email || 'Registro sincronizado';
+        } catch(ex) {}
+
+        const isSuccess = !e.eventType.includes('ERROR') && !e.eventType.includes('ALERT');
+        const status = isSuccess ? 'SUCCESS' : 'WARNING';
+
+        return `
+            <tr>
+                <td style="color: #64748b;">${date}</td>
+                <td class="event-id">${id}</td>
+                <td>${e.origin || 'Edge-Gateway'}</td>
+                <td><span class="status-badge ${status.toLowerCase()}">${status}</span></td>
+                <td style="color: #475569;">${e.eventType}: ${details}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 btnLogout.addEventListener('click', async () => {

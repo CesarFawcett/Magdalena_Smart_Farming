@@ -44,6 +44,7 @@ public class CreateParcelaUseCase {
         parcelaData.setCurrentHealth(parcelaData.getEstado().equals("Activa") ? 90.0 : 40.0);
         parcelaData.setCurrentHumidity(42.0);
         parcelaData.setCurrentPh(6.2);
+        parcelaData.setCurrentTemperature(24.0);
 
         // 1. Save Event to Store (Event Sourcing)
         ParcelaCreatedEvent event = new ParcelaCreatedEvent(parcelaData);
@@ -70,6 +71,7 @@ public class CreateParcelaUseCase {
         entity.setCurrentHealth(parcelaData.getCurrentHealth());
         entity.setCurrentHumidity(parcelaData.getCurrentHumidity());
         entity.setCurrentPh(parcelaData.getCurrentPh());
+        entity.setCurrentTemperature(parcelaData.getCurrentTemperature());
         ParcelaEntity savedParcela = readRepository.save(entity);
 
         // 4. Associate Sensors

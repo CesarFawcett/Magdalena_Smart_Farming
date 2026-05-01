@@ -8,7 +8,7 @@ public class ManualReadingEvent extends DomainEvent {
     private final String sensorName;
 
     public ManualReadingEvent(UUID sensorId, String sensorName, String value) {
-        super("Operador Manual");
+        super(sensorName); // El origen debe ser el nombre del sensor
         this.sensorId = sensorId;
         this.sensorName = sensorName;
         this.value = value;
