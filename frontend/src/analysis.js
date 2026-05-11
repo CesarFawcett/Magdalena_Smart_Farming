@@ -226,6 +226,11 @@ function calculateIntervalAverage(events, rangeValue, idx, totalLabels, baseValu
 function initTempChart(labels, data) {
     const ctx = document.getElementById('temp-large-chart').getContext('2d');
     if (tempChart) tempChart.destroy();
+    // Gradient Background
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
+    gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
     tempChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -234,22 +239,40 @@ function initTempChart(labels, data) {
                 label: 'Temp °C',
                 data: data,
                 borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
-                pointRadius: labels.length > 30 ? 0 : 4,
-                pointBackgroundColor: '#ef4444'
+                borderWidth: 4,
+                pointRadius: labels.length > 30 ? 0 : 6,
+                pointBackgroundColor: 'white',
+                pointBorderColor: '#ef4444',
+                pointBorderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 14 },
+                    cornerRadius: 12,
+                    displayColors: false
+                }
+            },
             scales: {
-                y: { min: 10, max: 45, grid: { borderDash: [5, 5] } },
+                y: { 
+                    min: 10, 
+                    max: 45, 
+                    grid: { color: 'rgba(226, 232, 240, 0.5)', borderDash: [5, 5] },
+                    ticks: { color: '#64748b', font: { size: 11 } }
+                },
                 x: { 
                     grid: { display: false },
-                    ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 12 }
+                    ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 12, color: '#64748b' }
                 }
             }
         }
@@ -370,6 +393,11 @@ function updatePaginatedEvents() {
 function initHumidityChart(labels, data) {
     const ctx = document.getElementById('humidity-large-chart').getContext('2d');
     if (humidityChart) humidityChart.destroy();
+    // Gradient Background
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
     humidityChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -378,22 +406,40 @@ function initHumidityChart(labels, data) {
                 label: 'Humedad %',
                 data: data,
                 borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                backgroundColor: gradient,
                 fill: true,
                 tension: 0.4,
-                pointRadius: labels.length > 30 ? 0 : 4,
-                pointBackgroundColor: '#3b82f6'
+                borderWidth: 4,
+                pointRadius: labels.length > 30 ? 0 : 6,
+                pointBackgroundColor: 'white',
+                pointBorderColor: '#3b82f6',
+                pointBorderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 14 },
+                    cornerRadius: 12,
+                    displayColors: false
+                }
+            },
             scales: {
-                y: { min: 40, max: 80, grid: { borderDash: [5, 5] } },
+                y: { 
+                    min: 40, 
+                    max: 80, 
+                    grid: { color: 'rgba(226, 232, 240, 0.5)', borderDash: [5, 5] },
+                    ticks: { color: '#64748b', font: { size: 11 } }
+                },
                 x: { 
                     grid: { display: false },
-                    ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 12 }
+                    ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 12, color: '#64748b' }
                 }
             }
         }

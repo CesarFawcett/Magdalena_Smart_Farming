@@ -7,9 +7,13 @@
 }
 
 .analysis-header h1 {
-    font-size: 28px;
+    font-size: 32px;
+    font-weight: 800;
     color: var(--primary-green);
     margin-bottom: 4px;
+    background: var(--grad-premium);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .analysis-header p {
@@ -70,10 +74,16 @@
 
 .analysis-card {
     background: var(--white);
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: var(--shadow-sm);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analysis-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
 }
 
 .analysis-card .card-header {
@@ -179,8 +189,9 @@
 .range-fill {
     position: absolute;
     height: 100%;
-    background: linear-gradient(90deg, #ef4444 0%, #22c55e 50%, #ef4444 100%);
+    background: linear-gradient(90deg, #F87171 0%, #34D399 50%, #F87171 100%);
     border-radius: 4px;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
 }
 
 .range-marker {

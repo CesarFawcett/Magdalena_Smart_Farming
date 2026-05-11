@@ -54,6 +54,13 @@ export const getSession = async () => {
 
 export const clearSession = async () => {
   const db = await initDB();
+  
+  // Clear localStorage items
+  localStorage.removeItem('magdalena_manual_offline');
+  localStorage.removeItem('magdalena_local_sync_logs');
+  localStorage.removeItem('magdalena_session'); // Standard session
+  localStorage.removeItem('token'); // Just in case it's separate
+  
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_NAME], 'readwrite');
     const store = transaction.objectStore(STORE_NAME);

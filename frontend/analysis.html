@@ -55,18 +55,17 @@
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
+                <button id="mobile-menu-btn" class="mobile-only">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
                 <div class="page-title">
                     <span class="breadcrumb">Magdalena Smart Farming</span>
                 </div>
 
                 <div class="top-bar-actions">
-                    <div class="status-indicator rabbitmq">
+                    <div id="system-status" class="status-indicator offline">
                         <span class="status-icon"></span>
-                        RABBITMQ
-                    </div>
-                    <div class="status-indicator localdb">
-                        <span class="status-icon"></span>
-                        LOCALDB
+                        OFFLINE
                     </div>
                     <button class="notification-btn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -318,6 +317,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="/src/notifications.js"></script>
+    <script src="/src/mobile.js"></script>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <script type="module" src="/src/analysis.js"></script>
 </body>

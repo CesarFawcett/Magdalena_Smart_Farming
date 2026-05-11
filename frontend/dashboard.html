@@ -54,19 +54,18 @@
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
+                <button id="mobile-menu-btn" class="mobile-only">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
                 <div class="search-container">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" id="search-input" placeholder="Buscar datos de la finca...">
                 </div>
 
                 <div class="top-bar-actions">
-                    <div class="status-indicator rabbitmq">
+                    <div id="system-status" class="status-indicator offline">
                         <span class="status-icon"></span>
-                        RABBITMQ
-                    </div>
-                    <div class="status-indicator localdb">
-                        <span class="status-icon"></span>
-                        LOCALDB
+                        OFFLINE
                     </div>
                     <button class="notification-btn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -88,6 +87,35 @@
             <div class="content-body">
                 <!-- Summary Section -->
                 <section class="summary-grid">
+                    <!-- Weather Predictor Widget -->
+                    <div class="weather-widget">
+                        <div class="weather-main">
+                            <div id="weather-icon-container">
+                                <!-- Dynamic Icon -->
+                                <svg class="weather-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                            </div>
+                            <div class="weather-info">
+                                <h4>Clima Predictivo</h4>
+                                <div id="weather-location-text" style="font-size: 11px; opacity: 0.7; font-weight: 600; text-transform: uppercase; margin-top: -4px;">Santa Marta, Colombia</div>
+                                <div class="weather-temp" id="current-temp">24°C</div>
+                                <div class="weather-condition" id="current-condition">Soleado</div>
+                            </div>
+                        </div>
+                        <div class="weather-details">
+                            <div class="weather-stat">
+                                <span class="weather-stat-label">Lluvia</span>
+                                <span class="weather-stat-value" id="rain-prob">5%</span>
+                            </div>
+                            <div class="weather-stat">
+                                <span class="weather-stat-label">Viento</span>
+                                <span class="weather-stat-value" id="wind-speed">12 km/h</span>
+                            </div>
+                            <div class="weather-stat">
+                                <span class="weather-stat-label">Humedad</span>
+                                <span class="weather-stat-value" id="air-humidity">62%</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="summary-card">
                         <div class="card-header">
                             <div class="card-icon health">
@@ -273,6 +301,44 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="/src/notifications.js"></script>
+    <script src="/src/mobile.js"></script>
+
+    <!-- Climate Risk Modal -->
+    <div id="climate-risk-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Riesgos por Lluvia Intensa</h2>
+                <button id="close-climate-modal" class="close-btn">&times;</button>
+            </div>
+            <div class="risk-body">
+                <div class="risk-info-card">
+                    <div class="risk-icon-header">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>
+                        <h3>Probabilidad: <span id="risk-prob-text">75%</span></h3>
+                    </div>
+                    <p>La intensidad de lluvia prevista puede afectar gravemente los siguientes puntos:</p>
+                    <ul class="risk-list">
+                        <li><strong>Erosión del Suelo:</strong> Riesgo alto de lavado de nutrientes en las zonas con pendiente.</li>
+                        <li><strong>Estrés Hídrico Inverso:</strong> Posible saturación de raíces por falta de drenaje eficiente.</li>
+                        <li><strong>Proliferación de Hongos:</strong> El aumento de humedad foliar favorece patógenos como el Oídio o Mildiu.</li>
+                    </ul>
+                    <div class="protection-box">
+                        <h4>Acciones Recomendadas:</h4>
+                        <p>1. Desconectar sistemas de riego automáticos.</p>
+                        <p>2. Verificar que los canales de desagüe estén libres de sedimentos.</p>
+                        <p>3. Resguardar sensores portátiles y equipos electrónicos en campo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-modal" id="btn-ack-risks" style="width: 100%;">ENTENDIDO, VOLVER AL TABLERO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container for Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <script type="module" src="/src/dashboard.js"></script>
 </body>

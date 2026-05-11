@@ -10,6 +10,43 @@ let globalEvents = [];
 let globalSensors = [];
 let chartInstances = {};
 let stompClient = null;
+let currentRainProb = 0;
+
+// Notification System
+class NotificationManager {
+    constructor() {
+        this.container = document.getElementById('toast-container');
+    }
+
+    show(title, message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+            success: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+            warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            danger: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+            info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon">${icons[type] || icons.info}</div>
+            <div class="toast-content">
+                <h5>${title}</h5>
+                <p>${message}</p>
+            </div>
+        `;
+
+        this.container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            setTimeout(() => toast.remove(), 400);
+        }, 5000);
+    }
+}
+
+const notifications = new NotificationManager();
 
 // Profile Modal Elements
 const profileModal = document.getElementById('profile-modal');
@@ -35,6 +72,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Load and Render Parcels
     loadParcels();
     loadStats();
+    initWeather();
     
     // Connect to WebSockets
     connectWebSocket();
@@ -61,6 +99,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 function connectWebSocket() {
+    if (localStorage.getItem('magdalena_manual_offline') === 'true') {
+        console.warn('Dashboard: Manual Offline Mode active.');
+        return;
+    }
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient = Stomp.over(socket);
     stompClient.debug = null; // Disable logging for cleaner console
@@ -68,13 +110,7 @@ function connectWebSocket() {
     stompClient.connect({}, (frame) => {
         console.log('Connected to WebSocket');
         
-        // Indicate connection status
-        const localDbIndicator = document.querySelector('.status-indicator.localdb');
-        if (localDbIndicator) {
-            localDbIndicator.style.color = '#10B981';
-            localDbIndicator.querySelector('.status-icon').style.backgroundColor = '#10B981';
-        }
-
+        
         stompClient.subscribe('/topic/sensors', (message) => {
             const event = JSON.parse(message.body);
             console.log('Real-time sensor update:', event);
@@ -84,6 +120,21 @@ function connectWebSocket() {
             // Fast refresh: Update data and charts only, without re-rendering HTML
             updateDataAndCharts();
             loadStats();
+
+            // Show toast for critical events
+            if (event.eventType.includes('ALERT') || event.eventType.includes('ERROR')) {
+                notifications.show('Alerta de Sistema', event.eventType + ': ' + event.payload, 'warning');
+            }
+
+            // Capture Rain Probability for Stats
+            if (event.origin?.toLowerCase().includes('clima') || event.eventType.toLowerCase().includes('clima')) {
+                try {
+                    const p = event.payload || event;
+                    const valStr = (typeof p === 'object' ? p.value : p) || event.value;
+                    currentRainProb = parseFloat(valStr) || 0;
+                    loadStats(); 
+                } catch(e) {}
+            }
         });
     }, (error) => {
         console.error('WebSocket error:', error);
@@ -316,11 +367,14 @@ async function loadStats() {
         // Update PH
         document.getElementById('ph-value').textContent = stats.phPromedio.toFixed(1);
 
-        // Update Alerts
+        // Update Alerts (Include Climate Alert if >= 75%)
         const alertsEl = document.getElementById('alerts-value');
-        alertsEl.textContent = `${stats.alertasActivas} Advertencia${stats.alertasActivas !== 1 ? 's' : ''}`;
+        let totalAlerts = stats.alertasActivas;
+        if (currentRainProb >= 75) totalAlerts++;
         
-        if (stats.alertasActivas > 0) {
+        alertsEl.textContent = `${totalAlerts} Advertencia${totalAlerts !== 1 ? 's' : ''}`;
+        
+        if (totalAlerts > 0) {
             alertsEl.classList.add('danger');
         } else {
             alertsEl.classList.remove('danger');
@@ -386,7 +440,12 @@ function initChart(parcel, events = [], sensorType = 'Humedad') {
     const chartColor = isHealthy ? '#10b981' : '#ef4444';
     const values = dataPoints.map(d => d.value);
     
-    // Calculate stable Y range (minimum 20 units range to avoid "melting" effect on small variations)
+    // Gradient Background
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, isHealthy ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    // Calculate stable Y range
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
     const center = (minVal + maxVal) / 2;
@@ -400,20 +459,35 @@ function initChart(parcel, events = [], sensorType = 'Humedad') {
             datasets: [{
                 data: values,
                 borderColor: chartColor,
-                backgroundColor: 'transparent',
-                borderWidth: 3,
-                pointRadius: 5,
-                pointHoverRadius: 8,
-                pointBackgroundColor: chartColor,
-                fill: false,
-                tension: 0
+                backgroundColor: gradient,
+                borderWidth: 4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: 'white',
+                pointBorderColor: chartColor,
+                pointBorderWidth: 2,
+                fill: true,
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 0 }, // Instant update to avoid "melting" animation
-            plugins: { legend: { display: false } },
+            animation: { 
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleFont: { size: 10 },
+                    bodyFont: { size: 12, weight: 'bold' },
+                    padding: 10,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
             scales: {
                 x: { 
                     display: true, 
@@ -422,7 +496,7 @@ function initChart(parcel, events = [], sensorType = 'Humedad') {
                 },
                 y: { 
                     display: true, 
-                    grid: { color: 'rgba(0,0,0,0.03)' },
+                    grid: { color: 'rgba(226, 232, 240, 0.5)', borderDash: [5, 5] },
                     ticks: { color: '#94a3b8', font: { size: 10 } },
                     min: yMin,
                     max: yMax
@@ -430,6 +504,51 @@ function initChart(parcel, events = [], sensorType = 'Humedad') {
             }
         }
     });
+}
+
+async function initWeather() {
+    const lat = 11.2418; // Santa Marta, Colombia
+    const lon = -74.1990;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+
+    const updateWeather = async () => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const current = data.current;
+
+            const locationEl = document.getElementById('weather-location-text');
+            if (locationEl) locationEl.textContent = 'Santa Marta, Colombia';
+
+            const code = current.weather_code;
+            let condition = { text: 'Soleado', icon: '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>' };
+
+            if (code >= 1 && code <= 3) {
+                condition = { text: 'Nublado', icon: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>' };
+            } else if (code >= 51 && code <= 67 || code >= 80 && code <= 82) {
+                condition = { text: 'Lluvia', icon: '<path d="M16 13v8m-4-7v8m-4-7v8m11-11h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>' };
+            } else if (code >= 95) {
+                condition = { text: 'Tormenta', icon: '<path d="M13 2l-2 8h3l-4 8m9-8h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>' };
+            }
+
+            document.getElementById('current-temp').textContent = `${Math.round(current.temperature_2m)}°C`;
+            document.getElementById('current-condition').textContent = condition.text;
+            document.getElementById('rain-prob').textContent = `${Math.round(current.precipitation * 10)}%`; // Simplified mapping
+            document.getElementById('wind-speed').textContent = `${current.wind_speed_10m} km/h`;
+            document.getElementById('air-humidity').textContent = `${current.relative_humidity_2m}%`;
+            
+            document.getElementById('weather-icon-container').innerHTML = `
+                <svg class="weather-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    ${condition.icon}
+                </svg>
+            `;
+        } catch (error) {
+            console.error('Error fetching weather:', error);
+        }
+    };
+
+    updateWeather();
+    setInterval(updateWeather, 600000); // Update every 10 minutes
 }
 
 window.changeChart = (parcelId, type) => {
@@ -654,6 +773,32 @@ document.querySelectorAll('.toggle-password').forEach(btn => {
         }
     });
 });
+
+// Climate Risk Modal Logic
+const climateModal = document.getElementById('climate-risk-modal');
+const closeClimate = document.getElementById('close-climate-modal');
+const btnAckRisks = document.getElementById('btn-ack-risks');
+
+btnShowAlerts.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentRainProb >= 75) {
+        document.getElementById('risk-prob-text').textContent = `${currentRainProb.toFixed(0)}%`;
+        climateModal.classList.remove('hidden');
+    } else {
+        const filtered = allParcels.filter(p => 
+            p.estado !== 'Activa' || (p.currentHealth !== null && p.currentHealth < 50)
+        );
+        if (filtered.length === 0) {
+            notifications.show('Información', 'No hay alertas críticas en las parcelas.', 'info');
+        } else {
+            renderParcels(filtered, globalEvents, globalSensors);
+        }
+    }
+});
+
+const hideClimateModal = () => climateModal.classList.add('hidden');
+closeClimate.onclick = hideClimateModal;
+btnAckRisks.onclick = hideClimateModal;
 
 window.deleteParcela = deleteParcela;
 window.viewDetails = viewDetails;
