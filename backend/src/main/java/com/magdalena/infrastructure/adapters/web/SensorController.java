@@ -1,10 +1,10 @@
 package com.magdalena.infrastructure.adapters.web;
 
 import com.magdalena.domain.events.ManualReadingEvent;
+import com.magdalena.domain.model.Sensor;
 import com.magdalena.domain.ports.EventStorePort;
-import com.magdalena.infrastructure.adapters.persistence.JpaSensorRepository;
-import com.magdalena.infrastructure.adapters.persistence.JpaParcelaRepository;
-import com.magdalena.infrastructure.adapters.persistence.SensorEntity;
+import com.magdalena.domain.ports.ParcelaRepositoryPort;
+import com.magdalena.domain.ports.SensorRepositoryPort;
 import com.magdalena.application.services.SimulationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +18,13 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class SensorController {
 
-    private final JpaSensorRepository sensorRepository;
-    private final JpaParcelaRepository parcelaRepository;
+    private final SensorRepositoryPort sensorRepository;
+    private final ParcelaRepositoryPort parcelaRepository;
     private final EventStorePort eventStore;
     private final SimulationService simulationService;
 
-    public SensorController(JpaSensorRepository sensorRepository, 
-                            JpaParcelaRepository parcelaRepository,
+    public SensorController(SensorRepositoryPort sensorRepository, 
+                            ParcelaRepositoryPort parcelaRepository,
                             EventStorePort eventStore,
                             SimulationService simulationService) {
         this.sensorRepository = sensorRepository;
@@ -41,7 +41,7 @@ public class SensorController {
             return ResponseEntity.notFound().build();
         }
 
-        SensorEntity sensor = sensorOpt.get();
+        Sensor sensor = sensorOpt.get();
         String rawValue = payload.get("value");
         eventStore.save(new ManualReadingEvent(id, sensor.getNombre(), rawValue));
         
@@ -57,19 +57,19 @@ public class SensorController {
     }
 
     @GetMapping
-    public List<SensorEntity> getAll() {
+    public List<Sensor> getAll() {
         return sensorRepository.findAll();
     }
 
     @PostMapping
-    public ResponseEntity<SensorEntity> save(@RequestBody SensorEntity sensor) {
+    public ResponseEntity<Sensor> save(@RequestBody Sensor sensor) {
         if (sensor.getId() == null) {
             sensor.setId(UUID.randomUUID());
         }
         
         // Ensure parcels are managed if provided
         if (sensor.getParcelas() != null) {
-            java.util.Set<com.magdalena.infrastructure.adapters.persistence.ParcelaEntity> managedParcels = new java.util.HashSet<>();
+            java.util.List<com.magdalena.domain.model.Parcela> managedParcels = new java.util.ArrayList<>();
             sensor.getParcelas().forEach(p -> {
                 parcelaRepository.findById(p.getId()).ifPresent(managedParcels::add);
             });
@@ -111,6 +111,7 @@ public class SensorController {
             p.setCurrentHealth(0.0);
             p.setCurrentHumidity(0.0);
             p.setCurrentPh(0.0);
+            p.setCurrentTemperature(0.0);
             parcelaRepository.save(p);
         });
 
@@ -118,14 +119,14 @@ public class SensorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SensorEntity> update(@PathVariable UUID id, @RequestBody SensorEntity updated) {
+    public ResponseEntity<Sensor> update(@PathVariable UUID id, @RequestBody Sensor updated) {
         return sensorRepository.findById(id).map(sensor -> {
             sensor.setModoOperacion(updated.getModoOperacion());
             sensor.setEstado(updated.getEstado());
             
             // Allow updating parcels
             if (updated.getParcelas() != null) {
-                java.util.Set<com.magdalena.infrastructure.adapters.persistence.ParcelaEntity> managedParcels = new java.util.HashSet<>();
+                java.util.List<com.magdalena.domain.model.Parcela> managedParcels = new java.util.ArrayList<>();
                 updated.getParcelas().forEach(p -> {
                     parcelaRepository.findById(p.getId()).ifPresent(managedParcels::add);
                 });

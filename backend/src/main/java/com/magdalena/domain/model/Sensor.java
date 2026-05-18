@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,5 +20,8 @@ public class Sensor {
     private UUID cropId;
     private String estado;
     private Boolean enLinea;
+    private String modoOperacion; // ENCENDIDO, APAGADO, MANUAL
+    private Double ultimoValor;
     private LocalDateTime fechaInstalacion;
+    private List<Parcela> parcelas;
 }

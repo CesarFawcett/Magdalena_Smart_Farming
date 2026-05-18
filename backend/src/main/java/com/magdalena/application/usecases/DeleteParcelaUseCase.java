@@ -2,17 +2,17 @@ package com.magdalena.application.usecases;
 
 import com.magdalena.domain.events.ParcelaDeletedEvent;
 import com.magdalena.domain.ports.EventStorePort;
-import com.magdalena.infrastructure.adapters.persistence.JpaParcelaRepository;
+import com.magdalena.domain.ports.ParcelaRepositoryPort;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
 public class DeleteParcelaUseCase {
 
-    private final JpaParcelaRepository repository;
+    private final ParcelaRepositoryPort repository;
     private final EventStorePort eventStore;
 
-    public DeleteParcelaUseCase(JpaParcelaRepository repository, EventStorePort eventStore) {
+    public DeleteParcelaUseCase(ParcelaRepositoryPort repository, EventStorePort eventStore) {
         this.repository = repository;
         this.eventStore = eventStore;
     }

@@ -1,8 +1,7 @@
 package com.magdalena.application.usecases;
 
-import com.magdalena.infrastructure.adapters.persistence.EventStoreEntity;
-import com.magdalena.infrastructure.adapters.persistence.JpaEventStoreRepository;
-import org.springframework.data.domain.Sort;
+import com.magdalena.domain.events.StoredEvent;
+import com.magdalena.domain.ports.EventStorePort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,13 +9,13 @@ import java.util.List;
 @Service
 public class GetEventHistoryUseCase {
 
-    private final JpaEventStoreRepository repository;
+    private final EventStorePort eventStorePort;
 
-    public GetEventHistoryUseCase(JpaEventStoreRepository repository) {
-        this.repository = repository;
+    public GetEventHistoryUseCase(EventStorePort eventStorePort) {
+        this.eventStorePort = eventStorePort;
     }
 
-    public List<EventStoreEntity> execute() {
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "occurredOn"));
+    public List<StoredEvent> execute() {
+        return eventStorePort.findAll();
     }
 }

@@ -5,7 +5,6 @@ import com.magdalena.application.usecases.DeleteParcelaUseCase;
 import com.magdalena.application.usecases.GetParcelaStatsUseCase;
 import com.magdalena.application.usecases.GetParcelasUseCase;
 import com.magdalena.domain.model.Parcela;
-import com.magdalena.infrastructure.adapters.persistence.ParcelaEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +37,7 @@ public class ParcelaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ParcelaEntity>> getAll() {
+    public ResponseEntity<List<Parcela>> getAll() {
         return ResponseEntity.ok(getParcelasUseCase.execute());
     }
 

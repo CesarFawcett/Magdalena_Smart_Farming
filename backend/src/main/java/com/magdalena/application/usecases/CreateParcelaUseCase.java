@@ -4,9 +4,8 @@ import com.magdalena.domain.events.ParcelaCreatedEvent;
 import com.magdalena.domain.model.Parcela;
 import com.magdalena.domain.ports.EventPublisherPort;
 import com.magdalena.domain.ports.EventStorePort;
-import com.magdalena.infrastructure.adapters.persistence.JpaParcelaRepository;
-import com.magdalena.infrastructure.adapters.persistence.ParcelaEntity;
-import com.magdalena.infrastructure.adapters.persistence.JpaSensorRepository;
+import com.magdalena.domain.ports.ParcelaRepositoryPort;
+import com.magdalena.domain.ports.SensorRepositoryPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +17,13 @@ public class CreateParcelaUseCase {
 
     private final EventStorePort eventStore;
     private final EventPublisherPort eventPublisher;
-    private final JpaParcelaRepository readRepository;
-    private final JpaSensorRepository sensorRepository;
+    private final ParcelaRepositoryPort readRepository;
+    private final SensorRepositoryPort sensorRepository;
 
     public CreateParcelaUseCase(EventStorePort eventStore, 
                                EventPublisherPort eventPublisher, 
-                               JpaParcelaRepository readRepository,
-                               JpaSensorRepository sensorRepository) {
+                               ParcelaRepositoryPort readRepository,
+                               SensorRepositoryPort sensorRepository) {
         this.eventStore = eventStore;
         this.eventPublisher = eventPublisher;
         this.readRepository = readRepository;
@@ -32,7 +31,6 @@ public class CreateParcelaUseCase {
     }
 
     @Transactional
-
     public Parcela execute(Parcela parcelaData) {
         // Initialize Parcela
         parcelaData.setId(UUID.randomUUID());
@@ -53,42 +51,19 @@ public class CreateParcelaUseCase {
         // 2. Publish Event (EDA)
         eventPublisher.publish(event);
 
-        // 3. Update Read Model (Sync Projection for now)
-        // In a complex system, this would be an async listener. 
-        // For simplicity, we update it here.
-        ParcelaEntity entity = new ParcelaEntity();
-        entity.setId(parcelaData.getId());
-        entity.setNombre(parcelaData.getNombre());
-        entity.setUbicacion(parcelaData.getUbicacion());
-        entity.setLatitud(parcelaData.getLatitud());
-        entity.setLongitud(parcelaData.getLongitud());
-        entity.setAreaTotal(parcelaData.getAreaTotal());
-        entity.setUnidadArea(parcelaData.getUnidadArea());
-        entity.setTipoSuelo(parcelaData.getTipoSuelo());
-        entity.setEstado(parcelaData.getEstado());
-        entity.setFechaRegistro(parcelaData.getFechaRegistro());
-        entity.setEnMonitoreo(parcelaData.getEnMonitoreo());
-        entity.setCurrentHealth(parcelaData.getCurrentHealth());
-        entity.setCurrentHumidity(parcelaData.getCurrentHumidity());
-        entity.setCurrentPh(parcelaData.getCurrentPh());
-        entity.setCurrentTemperature(parcelaData.getCurrentTemperature());
-        ParcelaEntity savedParcela = readRepository.save(entity);
+        // 3. Update Read Model
+        Parcela savedParcela = readRepository.save(parcelaData);
 
         // 4. Associate Sensors
         if (parcelaData.getSensorIds() != null && !parcelaData.getSensorIds().isEmpty()) {
             parcelaData.getSensorIds().forEach(sensorId -> {
                 sensorRepository.findById(sensorId).ifPresent(sensor -> {
-                    if (sensor.getParcelas() == null) {
-                        sensor.setParcelas(new java.util.HashSet<>());
-                    }
-                    sensor.getParcelas().add(savedParcela);
+                    sensor.setParcelaId(savedParcela.getId());
                     sensorRepository.save(sensor);
                 });
             });
         }
 
-        readRepository.save(entity);
-
-        return parcelaData;
+        return savedParcela;
     }
 }

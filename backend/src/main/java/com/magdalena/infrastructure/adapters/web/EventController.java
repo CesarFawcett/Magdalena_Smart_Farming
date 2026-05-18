@@ -1,7 +1,7 @@
 package com.magdalena.infrastructure.adapters.web;
 
 import com.magdalena.application.usecases.GetEventHistoryUseCase;
-import com.magdalena.infrastructure.adapters.persistence.EventStoreEntity;
+import com.magdalena.domain.events.StoredEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +28,7 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventStoreEntity>> getHistory() {
+    public ResponseEntity<List<StoredEvent>> getHistory() {
         System.out.println("🔍 Consultando historial de eventos...");
         return ResponseEntity.ok(getEventHistoryUseCase.execute());
     }

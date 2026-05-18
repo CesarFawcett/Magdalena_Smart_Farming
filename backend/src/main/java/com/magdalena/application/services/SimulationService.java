@@ -1,11 +1,11 @@
 package com.magdalena.application.services;
 
 import com.magdalena.domain.events.ManualReadingEvent;
+import com.magdalena.domain.model.Parcela;
+import com.magdalena.domain.model.Sensor;
 import com.magdalena.domain.ports.EventStorePort;
-import com.magdalena.infrastructure.adapters.persistence.JpaSensorRepository;
-import com.magdalena.infrastructure.adapters.persistence.JpaParcelaRepository;
-import com.magdalena.infrastructure.adapters.persistence.SensorEntity;
-import com.magdalena.infrastructure.adapters.persistence.ParcelaEntity;
+import com.magdalena.domain.ports.ParcelaRepositoryPort;
+import com.magdalena.domain.ports.SensorRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,15 +17,15 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SimulationService {
 
-    private final JpaSensorRepository sensorRepository;
-    private final JpaParcelaRepository parcelaRepository;
+    private final SensorRepositoryPort sensorRepository;
+    private final ParcelaRepositoryPort parcelaRepository;
     private final EventStorePort eventStore;
     private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
     private ScheduledExecutorService scheduler;
     private final Random random = new Random();
 
-    public SimulationService(JpaSensorRepository sensorRepository, 
-                             JpaParcelaRepository parcelaRepository,
+    public SimulationService(SensorRepositoryPort sensorRepository, 
+                             ParcelaRepositoryPort parcelaRepository,
                              EventStorePort eventStore,
                              org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate) {
         this.sensorRepository = sensorRepository;
@@ -55,7 +55,7 @@ public class SimulationService {
 
     private void generateData() {
         try {
-            List<SensorEntity> activeSensors = sensorRepository.findAll().stream()
+            List<Sensor> activeSensors = sensorRepository.findAll().stream()
                     .filter(s -> "ENCENDIDO".equals(s.getModoOperacion()))
                     .toList();
 
@@ -64,17 +64,17 @@ public class SimulationService {
                 return;
             }
 
-            for (SensorEntity sensor : activeSensors) {
+            for (Sensor sensor : activeSensors) {
                 double newValue = calculateNewValue(sensor);
                 sensor.setUltimoValor(newValue);
                 sensorRepository.save(sensor);
 
                 // Update associated parcels stats
-                if (sensor.getParcelas() != null) {
-                    for (ParcelaEntity parcela : sensor.getParcelas()) {
+                if (sensor.getParcelaId() != null) {
+                    parcelaRepository.findById(sensor.getParcelaId()).ifPresent(parcela -> {
                         updateParcelaStats(parcela, sensor, newValue);
                         parcelaRepository.save(parcela);
-                    }
+                    });
                 }
 
                 // Save event for history
@@ -92,7 +92,7 @@ public class SimulationService {
         }
     }
 
-    private void updateParcelaStats(ParcelaEntity parcela, SensorEntity sensor, double value) {
+    private void updateParcelaStats(Parcela parcela, Sensor sensor, double value) {
         String type = sensor.getTipo().toLowerCase();
         if (type.contains("humedad")) {
             parcela.setCurrentHumidity(value);
@@ -134,7 +134,7 @@ public class SimulationService {
         }
     }
 
-    private double calculateNewValue(SensorEntity sensor) {
+    private double calculateNewValue(Sensor sensor) {
         double current = sensor.getUltimoValor() != null ? sensor.getUltimoValor() : 0.0;
         double variation = (random.nextDouble() - 0.5) * 2.0; // +/- 1.0
 

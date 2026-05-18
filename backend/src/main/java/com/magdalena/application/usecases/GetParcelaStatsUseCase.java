@@ -1,7 +1,7 @@
 package com.magdalena.application.usecases;
 
-import com.magdalena.infrastructure.adapters.persistence.JpaParcelaRepository;
-import com.magdalena.infrastructure.adapters.persistence.ParcelaEntity;
+import com.magdalena.domain.model.Parcela;
+import com.magdalena.domain.ports.ParcelaRepositoryPort;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Service;
@@ -11,14 +11,14 @@ import java.util.List;
 @Service
 public class GetParcelaStatsUseCase {
 
-    private final JpaParcelaRepository repository;
+    private final ParcelaRepositoryPort repository;
 
-    public GetParcelaStatsUseCase(JpaParcelaRepository repository) {
+    public GetParcelaStatsUseCase(ParcelaRepositoryPort repository) {
         this.repository = repository;
     }
 
     public ParcelaStats execute() {
-        List<ParcelaEntity> parcelas = repository.findAll();
+        List<Parcela> parcelas = repository.findAll();
         
         if (parcelas.isEmpty()) {
             return ParcelaStats.builder()
@@ -34,7 +34,7 @@ public class GetParcelaStatsUseCase {
         double totalPh = 0;
         int alerts = 0;
 
-        for (ParcelaEntity p : parcelas) {
+        for (Parcela p : parcelas) {
             totalHealth += (p.getCurrentHealth() != null) ? p.getCurrentHealth() : 0;
             totalHumidity += (p.getCurrentHumidity() != null) ? p.getCurrentHumidity() : 0;
             totalPh += (p.getCurrentPh() != null) ? p.getCurrentPh() : 0;
