@@ -127,10 +127,21 @@ function renderSensors(sensors) {
         else if (typeKey.includes('viento')) iconType = 'wind';
         
         const parcelChips = s.parcelas && s.parcelas.length > 0 
-            ? s.parcelas.map(p => `<span class="parcel-chip">${p.nombre}</span>`).join('') 
+            ? s.parcelas.map(p => {
+                const fullParcel = allParcels.find(ap => String(ap.id) === String(p.id));
+                const name = fullParcel ? fullParcel.nombre : (p.nombre || p.id || 'Cultivo');
+                return `<span class="parcel-chip">${name}</span>`;
+            }).join('') 
             : '<span class="parcel-chip none">Global Gateway</span>';
 
-        const idNumeric = s.id ? s.id.split('-').reduce((acc, part) => acc + parseInt(part, 16), 0) : 0;
+        let idNumeric = 0;
+        if (s.id) {
+            if (typeof s.id === 'string') {
+                idNumeric = s.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            } else {
+                idNumeric = Number(s.id) || 0;
+            }
+        }
         const batteryLevel = 75 + (idNumeric % 25); 
 
         return `

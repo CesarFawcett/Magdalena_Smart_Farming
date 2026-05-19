@@ -1,4 +1,6 @@
 import { getSession, clearSession } from './utils/db';
+import { resolveUrl, isNativeApp } from './utils/api';
+import { handleMockRequest } from './utils/mockApi';
 
 const btnLogout = document.getElementById('btn-logout');
 const logsTableBody = document.getElementById('logs-table-body');
@@ -95,7 +97,7 @@ function connectWebSocket() {
         console.warn('Sync Center: Manual Offline Mode active.');
         return;
     }
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(resolveUrl('http://localhost:8080/ws'));
     stompClient = Stomp.over(socket);
     stompClient.debug = null; // Quiet logs
 
@@ -148,11 +150,20 @@ function addLiveEvent(event) {
 
 async function loadSyncLogs() {
     try {
-        const response = await fetch('http://localhost:8080/api/events', {
+        const url = resolveUrl('http://localhost:8080/api/events');
+        const options = {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
-        });
+        };
+
+        let response;
+        if (isNativeApp()) {
+            console.info('Native APK detected: using mock data for sync logs ->', url);
+            response = await handleMockRequest(url, options);
+        } else {
+            response = await fetch(url, options);
+        }
 
         if (response.ok) {
             allEvents = await response.json();

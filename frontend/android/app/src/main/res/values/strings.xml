@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Magdalena Smart Farming</string>
+    <string name="title_activity_main">Magdalena Smart Farming</string>
+    <string name="package_name">com.magdalena.smartfarming</string>
+    <string name="custom_url_scheme">com.magdalena.smartfarming</string>
+</resources>

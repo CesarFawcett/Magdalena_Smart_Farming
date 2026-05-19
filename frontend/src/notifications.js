@@ -1,5 +1,6 @@
 // Magdalena Smart Farming - Global Notification System
 // Handles weather alerts and notification badge
+import { resolveUrl } from './utils/api';
 
 let climateHistory = [];
 const MAX_HISTORY = 10;
@@ -105,7 +106,7 @@ function connectNotificationWebSocket() {
         return;
     }
 
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(resolveUrl('http://localhost:8080/ws'));
     const client = Stomp.over(socket);
     client.debug = null;
 

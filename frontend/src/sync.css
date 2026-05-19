@@ -340,3 +340,128 @@
     .sync-grid-top { grid-template-columns: 1fr; }
     .flow-visual { padding: 40px 20px; }
 }
+
+@media (max-width: 768px) {
+    .sync-grid-top {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .sync-card {
+        padding: 16px;
+        border-radius: 20px;
+    }
+    
+    .sync-card .card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .sync-card h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    
+    .sync-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .btn-sync-force, .btn-sync-offline {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .flow-section {
+        position: relative;
+    }
+    
+    .flow-indicators {
+        position: static;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+    
+    .flow-visual {
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px 12px;
+        align-items: center;
+    }
+    
+    .node-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+    }
+    
+    .node-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .flow-line {
+        width: 4px;
+        height: 60px;
+        flex: none;
+        margin: 12px auto;
+        background: #22c55e;
+    }
+    
+    .latency-badge {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        background: #f1f5f9;
+        color: #1e293b;
+        border: 1px solid var(--border-color);
+        padding: 4px 10px;
+        font-size: 9px;
+    }
+    
+    .logs-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .log-filters {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .log-filters select {
+        flex: 1;
+        max-width: 200px;
+    }
+    
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .logs-table {
+        min-width: 500px;
+    }
+    
+    .logs-table td, .logs-table th {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .logs-footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 0;
+        text-align: center;
+    }
+}

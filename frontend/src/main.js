@@ -1,5 +1,7 @@
 import './style.css';
 import { saveSession, getSession } from './utils/db';
+import { resolveUrl, openServerConfigModal, isNativeApp } from './utils/api';
+import { handleMockRequest } from './utils/mockApi';
 
 const loginForm = document.getElementById('login-form');
 const forgotPasswordForm = document.getElementById('forgot-password-form');
@@ -50,15 +52,24 @@ loginForm.addEventListener('submit', async (e) => {
   loginBtn.disabled = true;
   loginBtn.textContent = 'Autenticando...';
 
-  // real API call
+  // real API call or mock
   try {
-    const response = await fetch('http://localhost:8080/api/auth/login', {
+    let response;
+    const url = resolveUrl('http://localhost:8080/api/auth/login');
+    const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ email, password })
-    });
+    };
+
+    if (isNativeApp()) {
+        console.info('Native APK detected: using mock data for login ->', url);
+        response = await handleMockRequest(url, options);
+    } else {
+        response = await fetch(url, options);
+    }
 
     if (response.ok) {
       const data = await response.json();
@@ -127,3 +138,11 @@ inputs.forEach(input => {
     input.parentElement.querySelector('label').style.color = 'var(--text-muted)';
   });
 });
+
+// Server Configuration Modal Trigger
+const btnConfigServer = document.getElementById('btn-config-server');
+if (btnConfigServer) {
+  btnConfigServer.addEventListener('click', () => {
+    openServerConfigModal();
+  });
+}

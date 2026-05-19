@@ -1,0 +1,6 @@
+pSovwLu8T3jtG8zV
+
+
+en el frontend:
+npm run build
+npx cap sync android

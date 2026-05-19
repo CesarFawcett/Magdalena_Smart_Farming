@@ -358,4 +358,173 @@ body::before {
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
+/* Premium Server Config Modal Styles */
+.config-trigger-btn {
+  background: rgba(11, 57, 33, 0.1);
+  border: 1px solid rgba(11, 57, 33, 0.2);
+  color: var(--primary-green);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 12px auto 0 auto;
+}
+
+.config-trigger-btn:hover {
+  background: var(--primary-green);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 57, 33, 0.15);
+}
+
+.server-config-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.server-config-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.15);
+  animation: modalScaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.server-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.server-config-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-green);
+  letter-spacing: -0.5px;
+}
+
+.server-config-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.server-config-close:hover {
+  color: var(--primary-green);
+}
+
+.server-config-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.btn-test-connection {
+  width: 100%;
+  padding: 12px;
+  background: rgba(11, 57, 33, 0.08);
+  border: 1px dashed var(--accent-green);
+  color: var(--accent-green);
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.btn-test-connection:hover {
+  background: rgba(11, 57, 33, 0.15);
+  transform: translateY(-1px);
+}
+
+.connection-status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.connection-status-pill.success {
+  display: block;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.connection-status-pill.error {
+  display: block;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.connection-status-pill.loading {
+  display: block;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.server-config-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-secondary-config {
+  padding: 14px;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-secondary-config:hover {
+  background: #e2e8f0;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from { transform: scale(0.9) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+
 

@@ -368,3 +368,108 @@
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 768px) {
+    .analysis-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    
+    .analysis-header h1 {
+        font-size: 26px;
+    }
+    
+    .analysis-actions {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .date-selector, .parcel-selector {
+        width: 100%;
+        justify-content: space-between;
+        padding: 10px 16px;
+    }
+    
+    .btn-export {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+    
+    .analysis-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+    
+    .analysis-card .card-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .header-left {
+        align-items: center;
+    }
+    
+    .title-sub h3 {
+        font-size: 16px;
+    }
+    
+    .chart-container-large {
+        height: 220px;
+    }
+    
+    .gauge-section {
+        height: 220px;
+    }
+    
+    .event-history-section {
+        padding: 16px;
+        border-radius: 20px;
+    }
+    
+    .event-history-section .section-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+        margin-bottom: 16px;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .btn-outline-sm {
+        width: 100%;
+        text-align: center;
+        padding: 8px;
+    }
+    
+    .modal-content.large {
+        padding: 20px;
+        border-radius: 20px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .modal-header {
+        margin-bottom: 16px;
+    }
+    
+    .pagination-controls {
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 16px;
+        margin-top: 16px;
+    }
+    
+    #page-indicator {
+        order: -1;
+    }
+}

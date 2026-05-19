@@ -1,5 +1,5 @@
 import { getSession, clearSession } from './utils/db';
-import { authFetch } from './utils/api';
+import { authFetch, resolveUrl, openServerConfigModal } from './utils/api';
 
 const btnLogout = document.getElementById('btn-logout');
 const btnShowAlerts = document.getElementById('btn-show-alerts');
@@ -77,6 +77,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Connect to WebSockets
     connectWebSocket();
 
+    // Server Configuration Modal Trigger
+    const btnConfigServer = document.getElementById('btn-config-server');
+    if (btnConfigServer) {
+        btnConfigServer.addEventListener('click', () => {
+            openServerConfigModal();
+        });
+    }
+
     // Event Delegation for Lot Actions
     const container = document.getElementById('lots-container');
     if (container) {
@@ -103,7 +111,7 @@ function connectWebSocket() {
         console.warn('Dashboard: Manual Offline Mode active.');
         return;
     }
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(resolveUrl('http://localhost:8080/ws'));
     stompClient = Stomp.over(socket);
     stompClient.debug = null; // Disable logging for cleaner console
 
