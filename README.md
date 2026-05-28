@@ -1,6 +1,6 @@
 # Magdalena Smart Farming 🌾🚜
 
-**Magdalena Smart Farming** es un sistema premium de agricultura de precisión diseñado para el monitoreo inteligente de cultivos en la región del Magdalena. La plataforma permite la recolección de telemetría de sensores en tiempo real (humedad, temperatura, pH y estado del gateway), el cálculo automatizado de la salud del cultivo y el procesamiento de eventos mediante una arquitectura moderna desacoplada.
+**Magdalena Smart Farming** es un sistema de agricultura de precisión diseñado para el monitoreo inteligente de cultivos en la región del Magdalena. La plataforma permite la recolección de telemetría de sensores en tiempo real (humedad, temperatura, pH y estado del gateway), el cálculo automatizado de la salud del cultivo y el procesamiento de eventos mediante una arquitectura moderna desacoplada.
 
 El sistema está diseñado bajo un modelo híbrido **Edge-Cloud** preparado para funcionar de forma desconectada e implementar la sincronización de datos de manera automática cuando hay conectividad disponible.
 
